@@ -1,0 +1,14 @@
+{
+    "resolution_index": 4,
+    "fullscreen": true,
+    "music_on": false,
+    "sound_fx_on": false,
+    "difficulty": "Easy",
+    "key_bindings": {
+        "move_right": "RIGHT",
+        "move_left": "LEFT",
+        "move_up": "UP",
+        "move_down": "DOWN",
+        "fire": "SPACE"
+    }
+}

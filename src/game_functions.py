@@ -18,24 +18,28 @@ def load_sounds():
     sound_explosion = pygame.mixer.Sound('data/assets/sounds/explosion.ogg')
 
 
+def play_sound(sound, ai_settings):
+    """Play a sound if sound effects are enabled."""
+    if ai_settings.sound_fx_on:
+        sound.play()
+
+
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
-    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+    """Respond to keypresses."""
+    # Check if the pressed key matches any of our actions
+    if event.key == pygame.K_ESCAPE:
+        return
+        
+    if ai_settings.input_handler.is_key_for_action(event.key, 'move_right'):
         ship.moving_right = True
-
-    if event.key == pygame.K_q:
-        sys.exit()
-
-    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_left'):
         ship.moving_left = True
-
-    if event.key == pygame.K_SPACE:
-        fire_bullet(ai_settings, screen, ship, bullets)
-
-    if event.key == pygame.K_UP or event.key == pygame.K_w:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_up'):
         ship.moving_up = True
-
-    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_down'):
         ship.moving_down = True
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'fire'):
+        fire_bullet(ai_settings, screen, ship, bullets)
 
 
 def fire_bullet(ai_settings, screen, ship, bullets):
@@ -44,34 +48,35 @@ def fire_bullet(ai_settings, screen, ship, bullets):
     if len(bullets) < ai_settings.bullets_allowed:
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
-        sound_fire.play()
+        play_sound(sound_fire, ai_settings)
 
 
-def check_keyup_events(event, ship):
-    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+def check_keyup_events(event, ship, ai_settings):
+    """Respond to key releases."""
+    # Check which key was released
+    if event.key == pygame.K_ESCAPE:
+        return
+        
+    if ai_settings.input_handler.is_key_for_action(event.key, 'move_right'):
         ship.moving_right = False
-    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_left'):
         ship.moving_left = False
-    if event.key == pygame.K_UP or event.key == pygame.K_w:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_up'):
         ship.moving_up = False
-    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+    elif ai_settings.input_handler.is_key_for_action(event.key, 'move_down'):
         ship.moving_down = False
 
-    
+
 def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets, cargoes):
     """Respond to key presses and mouse events."""
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
             sys.exit()
-
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and stats.game_active:
             check_keydown_events(event, ai_settings, screen, ship, bullets)
-
-        elif event.type == pygame.KEYUP:
-            check_keyup_events(event, ship)
-
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.KEYUP and stats.game_active:
+            check_keyup_events(event, ship, ai_settings)
+        elif event.type == pygame.MOUSEBUTTONDOWN and not stats.game_active:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, cargoes, mouse_x, mouse_y)
 
@@ -172,21 +177,21 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
         for aliens in collisions_1.values():
             stats.score += ai_settings.alien_points * len(aliens)
             sb.prep_score()
-            sound_explosion.play()
+            play_sound(sound_explosion, ai_settings)
 
     # if we hit cargo:
     if collisions_2:
         for _ in collisions_2.values():
             stats.score -= ai_settings.cargo_points
             sb.prep_score()
-            sound_explosion.play()
+            play_sound(sound_explosion, ai_settings)
 
     # if cargo hit alien:
     if collisions_3:
         for _ in collisions_3.values():
             stats.score -= ai_settings.cargo_points
             sb.prep_score()
-            sound_explosion.play()
+            play_sound(sound_explosion, ai_settings)
 
     if len(aliens) == 0:
         # Destroy existing bullets, speed up game, and create new fleet.
@@ -249,9 +254,6 @@ def create_fleet(ai_settings, screen, ship, aliens, cargoes):
             # Create an alien and place it in the row.
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
-            if randint(1, 100) <= ai_settings.cargo_drop_chance:
-                create_cargo(ai_settings, screen, cargoes)
-
 
 def check_fleet_edges(ai_settings, aliens):
     """Respond appropriately if any aliens have reached an edge."""
@@ -306,6 +308,11 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets, cargoes, sb
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
     cargoes.update()
+
+    # Randomly spawn cargo ships during gameplay
+    if stats.game_active and ai_settings.cargo_drop_chance > 0:
+        if randint(1, 100) <= ai_settings.cargo_drop_chance:
+            create_cargo(ai_settings, screen, cargoes)
 
     if pygame.sprite.spritecollideany(ship, aliens):
         ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes)
