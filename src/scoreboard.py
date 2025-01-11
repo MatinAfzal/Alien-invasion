@@ -1,5 +1,7 @@
 from turtle import screensize
 import pygame.font
+from pygame.sprite import Group
+from src.ship import Ship
 
 
 class Scoreboard:
@@ -18,6 +20,9 @@ class Scoreboard:
 
         # Prepare the initial score image.
         self.prep_score()
+        
+        # Prepare the ships
+        self.prep_ships()
 
     def prep_score(self):
         """Turn the score into a rendered image."""
@@ -31,6 +36,19 @@ class Scoreboard:
         self.score_rect.right = self.screen_rect.right - 20
         self.score_rect.top = 20
 
+    def prep_ships(self):
+        """Show how many ships are left."""
+        self.ships = Group()
+        for ship_number in range(self.stats.ships_left):
+            ship = Ship(self.ai_settings, self.screen)
+            # Scale down the ship image for lives display
+            ship.image = pygame.transform.scale(ship.image, (ship.rect.width // 2, ship.rect.height // 2))
+            ship.rect = ship.image.get_rect()
+            ship.rect.x = 10 + ship_number * (ship.rect.width + 5)
+            ship.rect.y = 10
+            self.ships.add(ship)
+
     def show_score(self):
-        """Draw score to the screen."""
+        """Draw score and ships to the screen."""
         self.screen.blit(self.score_image, self.score_rect)
+        self.ships.draw(self.screen)

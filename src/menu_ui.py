@@ -86,7 +86,7 @@ class Menu:
                 button['callback']()
                 break
 
-    def draw(self):
+    def draw_menu(self):
         # Create menu surface
         menu_surface = pygame.Surface((self.width, self.height))
         menu_surface.fill(self.bg_color)
@@ -124,38 +124,20 @@ class MainMenu(Menu):
 
 
 class SettingsMenu(Menu):
-    def __init__(self, screen, ai_settings, back_to_main):
+    def __init__(self, screen, ai_settings, back_callback):
         super().__init__(screen, "Settings")
+        
+        # Add buttons
         self.ai_settings = ai_settings
-        self.back_to_main = back_to_main
-        
-        # Game Settings
-        self.add_button("Music: " + ("On" if ai_settings.music_on else "Off"), 
-                       self.toggle_music)
-        self.add_button("Sound FX: " + ("On" if ai_settings.sound_fx_on else "Off"), 
-                       self.toggle_sound_fx)
-        self.add_button("Difficulty: " + ai_settings.difficulty, 
-                       self.cycle_difficulty)
-        
-        # Display Settings
-        current_res = f"{ai_settings.screen_width}x{ai_settings.screen_height}"
-        self.add_button(f"Resolution: {current_res}",
-                       self.cycle_resolution)
-        self.add_button("Fullscreen: " + ("On" if ai_settings.fullscreen else "Off"),
-                       self.toggle_fullscreen)
-        
-        # Controls submenu button
-        self.add_button("Controls...", self.show_controls_menu)
-        
-        # Back button
-        self.add_button("Back", self.save_and_back)
+        self.add_button("Music: " + ("On" if ai_settings.music_on else "Off"), self.toggle_music)
+        self.add_button("Sound FX: " + ("On" if ai_settings.sound_fx_on else "Off"), self.toggle_sound_fx)
+        self.add_button("Difficulty: " + ai_settings.difficulty, self.cycle_difficulty)
+        self.add_button("Fullscreen: " + ("On" if ai_settings.fullscreen else "Off"), self.toggle_fullscreen)
+        self.add_button("Controls", self.show_controls_menu)
+        self.add_separator()
+        self.add_button("Back", back_callback)
         
         self.controls_menu = None
-
-    def save_and_back(self):
-        """Save settings before going back to main menu."""
-        self.ai_settings.save_settings()
-        self.back_to_main()
 
     def toggle_music(self):
         self.ai_settings.music_on = not self.ai_settings.music_on
@@ -188,21 +170,16 @@ class SettingsMenu(Menu):
         else:
             super().handle_event(event)
 
-    def draw(self):
+    def draw_menu(self):
         if self.controls_menu:
-            self.controls_menu.draw()
+            self.controls_menu.draw_menu()
         else:
-            super().draw()
-
-    def cycle_resolution(self):
-        new_res = self.ai_settings.cycle_resolution()
-        self.buttons[3]['text'] = f"Resolution: {new_res[0]}x{new_res[1]}"
-        self.buttons[3]['text_image'] = self.font.render(self.buttons[3]['text'], True, self.text_color)
+            super().draw_menu()
 
     def toggle_fullscreen(self):
         is_fullscreen = self.ai_settings.toggle_fullscreen()
-        self.buttons[4]['text'] = "Fullscreen: " + ("On" if is_fullscreen else "Off")
-        self.buttons[4]['text_image'] = self.font.render(self.buttons[4]['text'], True, self.text_color)
+        self.buttons[3]['text'] = "Fullscreen: " + ("On" if is_fullscreen else "Off")
+        self.buttons[3]['text_image'] = self.font.render(self.buttons[3]['text'], True, self.text_color)
 
 
 class ControlsMenu(Menu):
@@ -277,7 +254,7 @@ class ControlsMenu(Menu):
         else:
             super().handle_event(event)
 
-    def draw(self):
+    def draw_menu(self):
         # Create menu surface
         menu_surface = pygame.Surface((self.width, self.height))
         menu_surface.fill(self.bg_color)
@@ -303,6 +280,60 @@ class ControlsMenu(Menu):
                 # Draw key binding status if waiting
                 if self.waiting_for_key and button.get('text', '').startswith(self.current_action.replace('_', ' ').title()):
                     pygame.draw.rect(menu_surface, (255, 255, 0), button['rect'], 2)  # Yellow border
+        
+        # Draw menu on screen
+        menu_rect = menu_surface.get_rect()
+        menu_rect.center = self.screen_rect.center
+        self.screen.blit(menu_surface, menu_rect)
+
+
+class GameOverMenu(Menu):
+    def __init__(self, screen, restart_game, show_main_menu, quit_game, score):
+        super().__init__(screen, "Game Over")
+        
+        # Create score text
+        score_text = f"Final Score: {score}"
+        self.score_image = self.font.render(score_text, True, self.text_color)
+        self.score_rect = self.score_image.get_rect()
+        self.score_rect.centerx = self.width // 2
+        self.score_rect.top = self.title_rect.bottom + 50
+        
+        # Calculate button start position
+        button_start_y = self.score_rect.bottom + 50
+        
+        # Add buttons
+        self.add_button("Play Again", restart_game)
+        self.add_button("Main Menu", show_main_menu)
+        self.add_button("Quit", quit_game)
+        
+        # Adjust button positions
+        for i, button in enumerate(self.buttons):
+            button['rect'].y = button_start_y + (i * (self.button_height + self.button_spacing))
+            button['text_rect'].center = button['rect'].center
+    
+    def draw_menu(self):
+        # Create menu surface
+        menu_surface = pygame.Surface((self.width, self.height))
+        menu_surface.fill(self.bg_color)
+        
+        # Draw title
+        menu_surface.blit(self.title_image, self.title_rect)
+        
+        # Draw score
+        menu_surface.blit(self.score_image, self.score_rect)
+        
+        # Draw buttons
+        for button in self.buttons:
+            if button['is_separator']:
+                pygame.draw.line(menu_surface, (100, 100, 100),
+                               (button['rect'].left, button['rect'].centery),
+                               (button['rect'].right, button['rect'].centery), 2)
+            else:
+                color = self.button_hover_color if button['hover'] else self.button_color
+                if button['text'].startswith("Back"):
+                    color = (100, 100, 100) if button['hover'] else (50, 50, 50)
+                pygame.draw.rect(menu_surface, color, button['rect'])
+                menu_surface.blit(button['text_image'], button['text_rect'])
         
         # Draw menu on screen
         menu_rect = menu_surface.get_rect()

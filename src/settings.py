@@ -7,46 +7,45 @@ class Settings:
     """A class to store all settings for Alien Invasion."""
 
     def __init__(self):
-        """Initialize the game's static settings."""
-        # Available resolutions
-        self.available_resolutions = [
-            (800, 600),
-            (1024, 768),
-            (1280, 720),
-            (1366, 768),
-            (1920, 1080)
-        ]
-        
+        """Initialize the game's settings."""
         # Screen settings
-        self.resolution_index = 2  # Default to 1280x720
-        self.screen_width = self.available_resolutions[self.resolution_index][0]
-        self.screen_height = self.available_resolutions[self.resolution_index][1]
+        self.min_width = 800
+        self.min_height = 600
+        self.screen_width = 1280
+        self.screen_height = 720
         self.fullscreen = False
         self.bg_color = (0, 0, 0)
         self.fps = 60
 
-        # Input handler
-        self.input_handler = InputHandler()
-
-        # Background settings
+        # Background scrolling
         self.bg_screen_x = 0
         self.bg_screen_y = 0
         self.bg_screen_2_x = 0
-        self.bg_screen_2_y = -self.screen_height * 2
-        self.bg_screen_scroll_speed = 1
+        self.bg_screen_2_y = -self.screen_height
+        self.bg_scroll_speed = 1
+
+        # Input handler
+        self.input_handler = InputHandler()
 
         # Ship settings
         self.ship_limit = 3
+        self.ship_speed_factor_x = 2.5
+        self.ship_speed_factor_y = 1.5
 
         # Bullet settings
+        self.bullet_speed_factor = 3
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = 60, 60, 60
         self.bullets_allowed = 3
 
         # Alien settings
+        self.alien_speed_factor = 2
+        self.cargo_speed_factor = 0.5
         self.fleet_drop_speed = 10
         self.cargo_drop_chance = 10
+        self.alien_bullet_speed_factor = 1.5
+        self.alien_fire_chance = 3  # Chance out of 1000 for alien to fire
 
         # Menu settings
         self.music_on = True
@@ -57,6 +56,10 @@ class Settings:
         self.speedup_scale = 1.1
         # How quickly the alien point values increase
         self.score_scale = 1.5
+
+        # Scoring
+        self.alien_points = 50
+        self.cargo_points = 100
 
         # Debug settings
         self.debug_key = pygame.K_F3  # F3 key for debug toggle
@@ -141,9 +144,6 @@ class Settings:
     def toggle_fullscreen(self):
         """Toggle fullscreen mode."""
         self.fullscreen = not self.fullscreen
-        if not self.fullscreen:
-            # When exiting fullscreen, restore the selected resolution
-            self.screen_width, self.screen_height = self.available_resolutions[self.resolution_index]
         return self.fullscreen
 
     def set_resolution(self, width, height):
@@ -172,6 +172,12 @@ class Settings:
         self.alien_points = 50
         self.cargo_points = 100
         self.cargo_drop_chance = 0  # Start with no cargo ships
+        self.ship_speed_factor_x = 2.5
+        self.ship_speed_factor_y = 1.5
+        self.bullet_speed_factor = 3
+        self.alien_speed_factor = 2
+        self.cargo_speed_factor = 0.5
+        self.alien_bullet_speed_factor = 1.5
 
     def apply_difficulty_settings(self):
         """Apply settings based on difficulty level."""
@@ -201,11 +207,18 @@ class Settings:
             self.cargo_drop_chance = 5  # 5% chance per update
 
     def increase_speed(self):
-        """Increase speed settings and alien point values."""
+        """Increase speed settings."""
         self.ship_speed_factor_x *= self.speedup_scale
         self.ship_speed_factor_y *= self.speedup_scale
         self.bullet_speed_factor *= self.speedup_scale
         self.alien_speed_factor *= self.speedup_scale
         self.cargo_speed_factor *= self.speedup_scale
-
+        self.alien_bullet_speed_factor *= self.speedup_scale
+        self.cargo_drop_chance *= self.speedup_scale
         self.alien_points = int(self.alien_points * self.score_scale)
+
+    def handle_resize(self, width, height):
+        """Handle window resize event, enforcing minimum size."""
+        self.screen_width = max(width, self.min_width)
+        self.screen_height = max(height, self.min_height)
+        return self.screen_width, self.screen_height

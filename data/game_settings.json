@@ -1,8 +1,8 @@
 {
-    "resolution_index": 4,
-    "fullscreen": true,
-    "music_on": false,
-    "sound_fx_on": false,
+    "resolution_index": 1,
+    "fullscreen": false,
+    "music_on": true,
+    "sound_fx_on": true,
     "difficulty": "Easy",
     "key_bindings": {
         "move_right": "RIGHT",
