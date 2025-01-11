@@ -325,21 +325,16 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets, cargoes, sb
     if result == "game_over":
         return result
 
-      
-def alien_fire(ai_settings, screen, aliens, alien_bullets):
-    """Have aliens randomly fire bullets."""
-    for alien in aliens.sprites():
-        # Random chance for each alien to fire
-        if randint(1, 1000) <= ai_settings.alien_fire_chance:
-            # Create a new bullet
-            bullet = Bullet(ai_settings, screen, alien, -1)  # -1 for downward direction
-            alien_bullets.add(bullet)
-            if ai_settings.sound_fx_on:
-                play_sound(sound_fire, ai_settings)
-
-
 def check_bullet_ship_collisions(ai_settings, stats, screen, ship, alien_bullets, aliens, bullets, cargoes, sb):
     """Check for collisions between alien bullets and the player's ship."""
     if pygame.sprite.spritecollideany(ship, alien_bullets):
         ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes, sb)
         alien_bullets.empty()  # Clear alien bullets after hit
+
+def alien_fire(ai_settings,stats, screen, aliens, alien_bullets):
+    if stats.game_active : 
+        for alien in aliens.sprites():
+            if randint(1, 1000) <= ai_settings.alien_fire_chance:  
+                bullet = AlienBullet(ai_settings, screen, alien)
+                alien_bullets.add(bullet)
+                

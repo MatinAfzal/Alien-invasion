@@ -14,9 +14,9 @@ class Scoreboard:
         self.ai_settings = ai_settings
         self.stats = stats
         
-        # Font settings for scoring information.
-        self.text_color = (30, 30, 30)
-        self.font = pygame.font.SysFont("Arial", 20)
+        # # Font settings for scoring information.
+        self.text_color = (0, 180, 0)
+        self.font = pygame.font.Font("fonts/sevenSegment.ttf", 48)  
 
         # Prepare the initial score image.
         self.prep_score()
@@ -28,7 +28,7 @@ class Scoreboard:
         """Turn the score into a rendered image."""
         rounded_score = int(round(self.stats.score, -1))
         score_str = "{:,}".format(rounded_score)
-        score_str = str(self.stats.score)
+        score_str = str(self.stats.score).zfill(4)
         self.score_image = self.font.render(score_str, True, self.text_color, self.ai_settings.bg_color)
 
         # Display the score at the top right of the screen.
