@@ -118,6 +118,7 @@ def run_game():
 
     # Initialize timers
     alien_fire_timer = pygame.time.get_ticks()
+    alien_spawn_timer = pygame.time.get_ticks()
 
     # Start the main loop for the game.
     while True:
@@ -196,6 +197,7 @@ def run_game():
             if current_time - alien_fire_timer > 100:
                 alien_fire(ai_settings, screen, aliens, alien_bullets)
                 alien_fire_timer = current_time
+
 
         # Draw screen
         screen.fill(ai_settings.bg_color)

@@ -325,7 +325,7 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets, cargoes, sb
     if result == "game_over":
         return result
 
-
+      
 def alien_fire(ai_settings, screen, aliens, alien_bullets):
     """Have aliens randomly fire bullets."""
     for alien in aliens.sprites():

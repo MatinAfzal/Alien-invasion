@@ -16,6 +16,14 @@ class Settings:
         self.fullscreen = False
         self.bg_color = (0, 0, 0)
         self.fps = 60
+        self.resolution_index = 0
+        self.available_resolutions = [
+            (800, 600),
+            (1024, 768),
+            (1280, 720),
+            (1366, 768),
+            (1920, 1080)
+        ]
 
         # Background scrolling
         self.bg_screen_x = 0

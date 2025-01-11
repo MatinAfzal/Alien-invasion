@@ -1,0 +1,15 @@
+{
+    "resolution_index": 4,
+    "fullscreen": true,
+    "music_on": false,
+    "sound_fx_on": false,
+    "difficulty": "Hard",
+    "high_score": 0,
+    "key_bindings": {
+        "move_right": "RIGHT ARROW",
+        "move_left": "LEFT ARROW",
+        "move_up": "UP ARROW",
+        "move_down": "DOWN ARROW",
+        "fire": "SPACEBAR"
+    }
+}
