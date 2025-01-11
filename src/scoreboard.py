@@ -16,7 +16,7 @@ class Scoreboard:
         
         # # Font settings for scoring information.
         self.text_color = (0, 180, 0)
-        self.font = pygame.font.Font("fonts/sevenSegment.ttf", 48)  
+        self.font = pygame.font.Font("data/assets/fonts/sevenSegment.ttf", 48)  
 
         # Prepare the initial score image.
         self.prep_score()
