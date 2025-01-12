@@ -45,7 +45,7 @@ class Alien(Sprite):
             return True
         return None
 
-    def update(self):
+    def update(self, *args, **kwargs):
         """Move the aliens right or left."""
         if self.type == 0:
             self.x += (self.ai_settings.alien_speed_factor * self.ai_settings.fleet_direction)
