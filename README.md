@@ -37,14 +37,14 @@ The current release is **V1.1.0**, which includes several exciting updates:
 As I have worked on **V1.0.0** and made improvements in **V1.1.0**, I now want **you** to help make the game even **better**! Here’s how you can contribute:
 
 1. **Fork this repository** to your own GitHub account.
-2. Create a new branch from the **beta branch**.
+2. Create a new branch from the **develop branch**.
 3. **Develop** your improvements, features, or fixes in this new branch.
-4. **Submit a Pull Request** to the **beta branch**.  
+4. **Submit a Pull Request** to the **develop branch**.  
    - Make sure to provide a clear, detailed description of what your PR does and why it's important.
    - Ensure your code is well-documented and follows the existing code style.
 5. **Engage with other contributors** and provide feedback or support where needed.
 
-Please note: **All contributions should be made to the `beta` branch**, and **only pull requests to the `beta` branch will be reviewed** for merging. This will ensure a streamlined workflow as we refine and test new features.
+Please note: **All contributions should be made to the `develop` branch**, and **only pull requests to the `develop` branch will be reviewed** for merging. This will ensure a streamlined workflow as we refine and test new features.
 
 ---
 
@@ -77,7 +77,7 @@ python alien_invasion.py
 
 #### Branches:
 - main: The stable version of the game (only for release).
-- beta: The branch where development happens. Make all contributions here!
+- develop: The branch where development happens. Make all contributions here!
 
 ### Assets Used
 This game uses some amazing assets that we are thankful for. Here are the details:
