@@ -9,7 +9,7 @@ class Alien(Sprite):
 
     def __init__(self, ai_settings, screen, alien_type=0):
         """Initialize the alien and set its starting position."""
-        super(Alien, self).__init__()
+        super().__init__()
         self.type = alien_type  # 0 for alien, 1 for cargo
         self.screen = screen
         self.ai_settings = ai_settings
@@ -35,7 +35,7 @@ class Alien(Sprite):
 
         # Store the alien's exact position.
         self.x = float(self.rect.x)
-    
+
     def check_edges(self):
         """Return True if alien is at edge of screen."""
         screen_rect = self.screen.get_rect()
