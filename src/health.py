@@ -26,12 +26,10 @@ class Health:
             return
         self.current_hearts += 1
 
-    def minHealth(self, stats):
+    def decreaseHealth(self, damage):
         #todo: method description        
-        if self.current_hearts == 1 :
-            stats.game_active = False 
-            return 
-        self.current_hearts -= 1
+
+        self.current_hearts -= damage
 
     def show_health(self):
         HEART_SIZE = 20

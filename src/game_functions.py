@@ -5,6 +5,7 @@ from random import randint
 from src.bullet import Bullet
 from src.alien import Alien,AlienL2
 from src.bullet import AlienBullet
+from src.health import Health
 
 pygame.mixer.init()
 
@@ -208,7 +209,11 @@ def check_bullet_ship_collisions(ai_settings, screen, stats, health, ship, alien
     if collisions_1:
         sound_explosion.play()
         alien_bullets.remove(collisions_1)
-        health.minHealth(stats)
+        health.decreaseHealth(1)
+        if health.current_hearts == 0 :
+            ship_hit(ai_settings, stats, screen, ship, aliens, alien_bullets, cargoes,health)
+             
+        
 
 
 def get_number_aliens_x(ai_settings, alien_width):
@@ -285,11 +290,12 @@ def change_fleet_direction(ai_settings, aliens):
     ai_settings.fleet_direction *= -1
 
 
-def ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes):
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health:Health):
     """Respond to ship being hit by alien."""
     if stats.ships_left > 0:
         # Decrement ships_left.
         stats.ships_left -= 1
+        health.initHealth()
 
         # Empty the list of aliens and bullets.
         aliens.empty()
@@ -306,14 +312,14 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes):
         pygame.mouse.set_visible(True)
 
 
-def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets, cargoes):
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health):
     """Check if any alien have reached the bottom of the screen."""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             # Treat this same as if the ship got hit.
             if alien.type == 0:
-                ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes)
+                ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health)
                 break
 
 
@@ -327,15 +333,19 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets, cargoes, he
     if check_collideany_ship_alien:
         sound_explosion.play()
         aliens.remove(check_collideany_ship_alien)
-        health.minHealth(stats)
+        health.decreaseHealth(1)
+        if health.current_hearts == 0 :
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health)
 
     check_collideany_ship_cargoes = pygame.sprite.spritecollideany(ship, aliens)
     if check_collideany_ship_cargoes:
         sound_explosion.play()
         aliens.remove(check_collideany_ship_cargoes)
-        health.minHealth(stats)
+        health.decreaseHealth(1)
+        if health.current_hearts == 0 :
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health)
     # look for aliens hitting the bottom of the screen.
-    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets, cargoes)
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets, cargoes,health)
 
 def alien_fire(ai_settings,stats, screen, aliens, alien_bullets):
     if stats.game_active : 
