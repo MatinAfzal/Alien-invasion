@@ -19,7 +19,7 @@ def load_sounds():
     sound_explosion = pygame.mixer.Sound('data/assets/sounds/explosion.ogg')
 
 
-def check_keydown_events(event, ai_settings, screen, ship, bullets):
+def check_keydown_events(event, ai_settings, screen, stats, ship, bullets):
     if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
         ship.moving_right = True
 
@@ -30,7 +30,7 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         ship.moving_left = True
 
     if event.key == pygame.K_SPACE:
-        fire_bullet(ai_settings, screen, ship, bullets)
+        fire_bullet(ai_settings, screen, stats, ship, bullets)
 
     if event.key == pygame.K_UP or event.key == pygame.K_w:
         ship.moving_up = True
@@ -39,10 +39,10 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         ship.moving_down = True
 
 
-def fire_bullet(ai_settings, screen, ship, bullets):
+def fire_bullet(ai_settings, screen, stats, ship, bullets):
     """Fire a bullet if limit not reached yet."""
     # Create a new bullet and add it to the bullets group.
-    if len(bullets) < ai_settings.bullets_allowed:
+    if len(bullets) < ai_settings.bullets_allowed and stats.game_active:
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
         sound_fire.play()
@@ -67,7 +67,7 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets,
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event, ai_settings, screen, ship, bullets)
+            check_keydown_events(event, ai_settings, screen, stats, ship, bullets)
 
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
