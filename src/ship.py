@@ -1,4 +1,5 @@
 import pygame
+import math
 from psd_tools import PSDImage
 
 
@@ -19,6 +20,7 @@ class Ship:
         self.rect.centerx = self.screen_rect.centerx
         self.rect.centery = self.screen_rect.centery
         self.rect.bottom = self.screen_rect.bottom - self.rect.height + 64
+        self.angle = 0 # In radians
 
         # Store a decimal value for the ship's center.
         self.center = [float(self.rect.centerx), float(self.rect.centery)]
@@ -46,9 +48,17 @@ class Ship:
         self.rect.centerx = self.center[0]
         self.rect.centery = self.center[1]
 
+        # Update the ship's angle
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        dx = mouse_x - self.center[0] # The mouse position relative to the ship location
+        dy = mouse_y - self.center[1]
+        self.angle = math.atan2(-dx, -dy) # Calculate angle
+
     def bltime(self):
         """Draw the ship at its current location."""
-        self.screen.blit(self.image, self.rect)
+        rotated_image = pygame.transform.rotate(self.image, math.degrees(self.angle))
+        rotated_rec = rotated_image.get_rect(center=self.center)
+        self.screen.blit(rotated_image, rotated_rec)
 
     def center_ship(self):
         """Center the ship on the screen."""

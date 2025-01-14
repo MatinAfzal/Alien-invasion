@@ -1,4 +1,5 @@
 import pygame
+import math
 from pygame.sprite import Sprite
 
 
@@ -20,7 +21,9 @@ class Bullet(Sprite):
         self.rect.top = ship.rect.top
 
         # Store the bullet's position as a decimal value.
+        self.x = float(self.rect.x)
         self.y = float(self.rect.y)
+        self.angle = ship.angle
 
         self.color = ai_settings.bullet_color
         self.speed_factor = ai_settings.bullet_speed_factor
@@ -28,14 +31,18 @@ class Bullet(Sprite):
     def update(self):
         """Move the bullet up the screen."""
         # Update the decimal position of the bullet.
-        self.y -= self.speed_factor
+        self.x -= math.sin(self.angle) * self.speed_factor
+        self.y -= math.cos(self.angle) * self.speed_factor
 
         # Update the rect position
+        self.rect.x = self.x
         self.rect.y = self.y
 
     def draw_bullet(self):
         """Draw the bullet to the screen."""
-        self.screen.blit(self.image, self.rect)
+        rotated_image = pygame.transform.rotate(self.image, math.degrees(self.angle))
+        rotated_rec = rotated_image.get_rect(center=(self.rect.centerx, self.rect.centery))
+        self.screen.blit(rotated_image, rotated_rec)
 
 class AlienBullet(Sprite):
     """A Class to manage bullets fired from the aliens."""
