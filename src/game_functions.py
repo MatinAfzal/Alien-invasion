@@ -460,3 +460,65 @@ def remove_offscreen_aliens(aliens, screen_width, screen_height):
         if (alien.rect.right < 0 or alien.rect.left > screen_width or
                 alien.rect.bottom < 0 or alien.rect.top > screen_height):
             aliens.remove(alien)
+
+import pygame
+import time
+
+def show_loading_screen(screen, ai_settings):
+    """Display a loading screen with logo and text."""
+    # Set up colors
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+
+    # Load the logo image
+    logo = pygame.image.load(r"data/assets/images/logo.png")  
+    logo_rect = logo.get_rect(center=(ai_settings.screen_width // 2, ai_settings.screen_height // 2 - 50))
+
+
+    # Fade-in effect
+    for alpha in range(0, 256, 5):  # Gradually increase alpha (opacity)
+        screen.fill(BLACK)  # Fill the screen with black
+        logo.set_alpha(alpha)  # Set the logo's opacity
+        screen.blit(logo, logo_rect)  # Draw the logo
+        pygame.display.flip()  # Update the screen
+        time.sleep(0.02)  # Control the speed of the fade-in
+
+    # Wait for a few seconds
+    time.sleep(2)  # Display the logo and text for 2 seconds
+
+    # Fade-out effect
+    for alpha in range(255, -1, -5):  # Gradually decrease alpha (opacity)
+        screen.fill(BLACK)  # Fill the screen with black
+        logo.set_alpha(alpha)  # Set the logo's opacity
+        screen.blit(logo, logo_rect)  # Draw the logo
+        pygame.display.flip()  # Update the screen
+        time.sleep(0.02)  # Control the speed of the fade-out
+
+def fade_in(screen, ai_settings, next_screen_func, *args):
+    """
+    Fade out the current screen and fade in the next screen.
+    :param screen: The game screen.
+    :param ai_settings: Game settings.
+    :param next_screen_func: The function to call for the next screen.
+    :param args: Arguments to pass to the next screen function.
+    """
+    fade_surface = pygame.Surface((ai_settings.screen_width, ai_settings.screen_height))
+    fade_surface.fill((0, 0, 0))  # Black color
+
+    # Fade out (current screen to black)
+    for alpha in range(0, 256, 5):  # Gradually increase alpha (opacity)
+        fade_surface.set_alpha(alpha)
+        screen.blit(fade_surface, (0, 0))
+        pygame.display.flip()
+        pygame.time.delay(10)  # Control the speed of the fade-out
+
+    # Call the next screen function (e.g., game screen, credits screen, or main menu)
+    next_screen_func(*args)
+
+    # Fade in (black to next screen)
+    for alpha in range(255, -1, -5):  # Gradually decrease alpha (opacity)
+        fade_surface.set_alpha(alpha)
+        next_screen_func(*args)  # Draw the next screen
+        screen.blit(fade_surface, (0, 0))
+        pygame.display.flip()
+        pygame.time.delay(10)  # Control the speed of the fade-in
