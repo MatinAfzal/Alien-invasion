@@ -19,8 +19,8 @@ def run_game():
     input = Input()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")
-    # Show the loading screen
-    show_loading_screen(screen, ai_settings)
+    if not ai_settings.debug_mode:
+        show_loading_screen(screen, ai_settings)
     screen_bg = pygame.image.load("data/assets/images/space3.png")
     screen_bg = pygame.transform.scale(screen_bg, (ai_settings.screen_width*2, ai_settings.screen_width*2))
     screen_bg_2 = pygame.transform.rotate(screen_bg, 180)
