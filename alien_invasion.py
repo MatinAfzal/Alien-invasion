@@ -1,6 +1,8 @@
 import pygame
 from pygame.sprite import Group
 import src.game_functions as gf
+from src.game_functions import show_loading_screen
+from src.game_functions import fade_in
 from src.game_stats import GameStats
 from src.settings import Settings
 from src.ship import Ship
@@ -17,6 +19,8 @@ def run_game():
     input = Input()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")
+    # Show the loading screen
+    show_loading_screen(screen, ai_settings)
     screen_bg = pygame.image.load("data/assets/images/space3.png")
     screen_bg = pygame.transform.scale(screen_bg, (ai_settings.screen_width*2, ai_settings.screen_width*2))
     screen_bg_2 = pygame.transform.rotate(screen_bg, 180)
@@ -40,41 +44,47 @@ def run_game():
     shields = Group()
 
     # Make the play button.
+    # Update the play button
     play_button = Button(
-        screen,
-        input,
-        position=(screen.get_rect().centerx - 100, screen.get_rect().centery + 25),
-        size=(200, 50),
-        text="Play",
-        foreground_color=(255, 255, 255),
-        background_color=(0, 225, 0),
-        border_width=0,
-        display_condition=lambda: not stats.game_active and not stats.credits_active,
-        on_clicked=lambda: gf.run_play_button(ai_settings, stats, ship, aliens, cargoes, bullets, health))
+      screen,
+      input,
+      position=(screen.get_rect().centerx - 100, screen.get_rect().centery + 25),
+      size=(200, 50),
+      text="Play",
+      foreground_color=(255, 255, 255),
+      background_color=(0, 225, 0),
+      border_width=0,
+      display_condition=lambda: not stats.game_active and not stats.credits_active,
+      on_clicked=lambda: fade_in(screen, ai_settings, gf.run_play_button, ai_settings, stats, ship, aliens, cargoes, bullets, health)
+  )
 
+    # Update the credits button
     credits_button = Button(
-        screen,
-        input,
-        position=(screen.get_rect().centerx - 100, screen.get_rect().centery + 100),
-        size=(200, 50),
-        text="Credits",
-        foreground_color=(255, 255, 255),
-        background_color=(0, 225, 0),
-        border_width=0,
-        display_condition=lambda: not stats.credits_active and not stats.game_active,
-        on_clicked=lambda: gf.run_credit_button(stats))
+      screen,
+      input,
+      position=(screen.get_rect().centerx - 100, screen.get_rect().centery + 100),
+      size=(200, 50),
+      text="Credits",
+      foreground_color=(255, 255, 255),
+      background_color=(0, 225, 0),
+      border_width=0,
+      display_condition=lambda: not stats.credits_active and not stats.game_active,
+      on_clicked=lambda: fade_in(screen, ai_settings, gf.run_credit_button, stats)
+  )
 
+    # Update the back button
     back_button = Button(
-        screen,
-        input,
-        position=(10, 50),
-        size=(200, 50),
-        text="Back",
-        foreground_color=(255, 255, 255),
-        background_color=(0, 225, 0),
-        border_width=0,
-        display_condition=lambda: stats.credits_active,
-        on_clicked=lambda: gf.run_back_button(stats))
+      screen,
+      input,
+      position=(10, 50),
+      size=(200, 50),
+      text="Back",
+      foreground_color=(255, 255, 255),
+      background_color=(0, 225, 0),
+      border_width=0,
+      display_condition=lambda: stats.credits_active,
+      on_clicked=lambda: fade_in(screen, ai_settings, gf.run_back_button, stats)
+  )
 
     alien_spawn_counter = 0
 
@@ -114,6 +124,7 @@ def run_game():
 
             alien_spawn_counter += 1
             alien_spawn_timer = current_time
+            
 
 
 run_game()
