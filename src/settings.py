@@ -1,7 +1,9 @@
 class Settings:
     """A class to store all settings for Alien Invasion"""
-
+     
     def __init__(self):
+        # Debug mode
+        self.debug_mode = True  # Set to False to show the loading screen
         """Initialize the game's static settings."""
         # Clock
         self.fps = 120.0
