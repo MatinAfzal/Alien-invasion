@@ -34,26 +34,14 @@ class ButtonState:
     pressed: bool = field(default=False, init=False)
 
     def set_pressed(self, value: bool) -> None:
-        """Set the button press state and adjust the elevation accordingly.
-
-        Args:
-            value (bool): True if the button is pressed, False otherwise.
-        """
+        """Set the button press state and adjust the elevation accordingly."""
         self.pressed = value
         self.elevation = 0 if value else ELEVATION_INIT_VALUE
 
 
 @dataclass
 class Button:
-    """Create a UI button with elevation effect, hover state, and click handling.
-
-    Attributes:
-        text (str): The label displayed on the button.
-        size (tuple[int, int]): The dimensions (width, height) of the button.
-        pos (tuple[int, int]): The top-left position (x, y) of the button.
-        on_click (Callable[[], None]): Callback function to be invoked when the button is clicked.
-        show_fn (Callable[[], bool]): Function that returns True if the button should be visible.
-    """
+    """Create a UI button with elevation effect, hover state, and click handling."""
 
     text: str  # Button label text
     size: tuple[int, int]  # Button width and height

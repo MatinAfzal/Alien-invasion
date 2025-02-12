@@ -90,7 +90,7 @@ class CargoAlien(Alien):
         self.rect.y -= self.ai_settings.cargo_speed_facto
 
     def get_image(self):
-        image = pygame.image.load(r"data/assets/sprites/alien_cargo.png")
+        image = pygame.image.load(r"assets/sprites/alien_cargo.png")
         image_size = image.get_size()
         return pygame.transform.scale(image, (image_size[0] * 0.2, image_size[1] * 0.2))
 
@@ -102,7 +102,7 @@ class AlienL1(Alien):
         super().__init__(ai_settings, screen, ai_settings.alien_l1_health)
 
     def get_image(self):
-        image = pygame.image.load(r"data/assets/sprites/alien_l1.png")
+        image = pygame.image.load(r"assets/sprites/alien_l1.png")
         return pygame.transform.rotate(image, 180)
 
 
@@ -113,6 +113,6 @@ class AlienL2(Alien):
         super().__init__(ai_settings, screen, ai_settings.alien_l2_health)
 
     def get_image(self):
-        image = pygame.image.load(r"data/assets/sprites/alien_l2.png")
+        image = pygame.image.load(r"assets/sprites/alien_l2.png")
         image = pygame.transform.scale(image, (60, 57))
         return pygame.transform.rotate(image, 180)

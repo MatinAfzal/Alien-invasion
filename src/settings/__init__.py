@@ -9,13 +9,9 @@ pygame.init()
 type Color = tuple[int, int, int]
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent
-ASSETS_DIR: Path = BASE_DIR / "data" / "assets"
-SOUNDS_DIR: Path = ASSETS_DIR / "sounds"
+ASSETS_DIR: Path = BASE_DIR / "assets"
 
-FONT = pygame.font.Font(
-    BASE_DIR / "data" / "assets" / "fonts" / "Silkscreen-Regular.ttf",
-    40,
-)
+FONT = pygame.font.Font(ASSETS_DIR / "fonts" / "Silkscreen-Regular.ttf", 40)
 FONT_ACCENT: int = FONT.get_ascent()
 
 

@@ -29,7 +29,7 @@ def run_game():
 
     # Create an instance to store game statistics and create scoreboard.
     stats = GameStats()
-    sb = Scoreboard(screen, stats)
+    sb = Scoreboard(stats)
 
     health = Health()
     health.reset()

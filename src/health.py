@@ -53,11 +53,11 @@ class Health:
         """Draw health bar in the top-left corner."""
         heart_size: tuple[int, int] = (20, 20)
         full_heart: pygame.Surface = pygame.transform.scale(
-            pygame.image.load("data/assets/hearts/full_heart.png"),
+            pygame.image.load("assets/hearts/full_heart.png"),
             heart_size,
         )
         empty_heart: pygame.Surface = pygame.transform.scale(
-            pygame.image.load("data/assets/hearts/empty_heart.png"),
+            pygame.image.load("assets/hearts/empty_heart.png"),
             heart_size,
         )
 

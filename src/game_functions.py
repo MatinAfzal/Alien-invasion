@@ -15,12 +15,12 @@ from .game_stats import GameStats
 
 pygame.mixer.init()
 
-sound_fire = pygame.mixer.Sound(settings.SOUNDS_DIR / "fire.ogg")
-sound_explosion = pygame.mixer.Sound(settings.SOUNDS_DIR / "explosion.ogg")
-sound_life = pygame.mixer.Sound(settings.SOUNDS_DIR / "life_pickup.flac")
-sound_damage = pygame.mixer.Sound(settings.SOUNDS_DIR / "damage.wav")
-sound_shield_fill = pygame.mixer.Sound(settings.SOUNDS_DIR / "shield_fill.wav")
-sound_shield_empty = pygame.mixer.Sound(settings.SOUNDS_DIR / "shield_empty.wav")
+sound_fire = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "fire.ogg")
+sound_explosion = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "explosion.ogg")
+sound_life = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "life_pickup.flac")
+sound_damage = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "damage.wav")
+sound_shield_fill = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "shield_fill.wav")
+sound_shield_empty = pygame.mixer.Sound(settings.ASSETS_DIR / "sounds" / "shield_empty.wav")
 
 text_lines = []
 text_rects = []
@@ -37,14 +37,14 @@ def load_animations(screen: pygame.Surface) -> None:
     global animations
     # animation frames
     fire_explosion_animation = Animation(
-        "data/assets/animations/explosion4",
+        "assets/animations/explosion4",
         15,
         screen,
         settings.DEFAULT_ANIMATION_LATENCY,
         4,
     )
 
-    shield_animation = Animation("data/assets/animations/shield3", 11, screen, 0, 2.6, False, 30)
+    shield_animation = Animation("assets/animations/shield3", 11, screen, 0, 2.6, False, 30)
 
     animations.append(fire_explosion_animation)
     animations.append(shield_animation)
