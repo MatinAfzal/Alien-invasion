@@ -1,8 +1,10 @@
+import sys
+
 import pygame
 from pygame.sprite import Group
 
 import src.game_functions as gf
-from src.entities.ui.elements.button import Button as btn
+from src.entities.ui.elements.button import Button
 from src.entities.ui.elements.scoreboard import Scoreboard
 from src.game_functions import generate_heart
 from src.game_stats import GameStats
@@ -43,7 +45,7 @@ def run_game():
     hearts = Group()
     shields = Group()
 
-    play_button = btn(
+    play_button = Button(
         "start",
         (240, 64),
         (screen.get_rect().centerx - 120, screen.get_rect().centery + -74),
@@ -51,7 +53,7 @@ def run_game():
         lambda: not stats.game_active and not stats.credits_active,
     )
 
-    credits_button = btn(
+    credits_button = Button(
         "Credits",
         (240, 64),
         (screen.get_rect().centerx - 120, screen.get_rect().centery + 10),
@@ -59,7 +61,15 @@ def run_game():
         lambda: not stats.credits_active and not stats.game_active,
     )
 
-    back_button = btn(
+    quit_button = Button(
+        "Quit",
+        (240, 64),
+        (screen.get_rect().centerx - 120, screen.get_rect().centery + 94),
+        sys.exit,
+        lambda: not stats.credits_active and not stats.game_active,
+    )
+
+    back_button = Button(
         "Back",
         (240, 64),
         (10, 50),
@@ -108,6 +118,7 @@ def run_game():
             bullets,
             play_button,
             credits_button,
+            quit_button,
             back_button,
             screen_bg,
             screen_bg_2,

@@ -133,10 +133,10 @@ def check_key_events(input, ship):
         pygame.quit()
         sys.exit()
 
-    ship.moving_right = True if input.is_key_down(pygame.K_RIGHT) or input.is_key_down(pygame.K_d) else False
-    ship.moving_left = True if input.is_key_down(pygame.K_LEFT) or input.is_key_down(pygame.K_a) else False
-    ship.moving_up = True if input.is_key_down(pygame.K_UP) or input.is_key_down(pygame.K_w) else False
-    ship.moving_down = True if input.is_key_down(pygame.K_DOWN) or input.is_key_down(pygame.K_s) else False
+    ship.moving_right = bool(input.is_key_down(pygame.K_RIGHT) or input.is_key_down(pygame.K_d))
+    ship.moving_left = bool(input.is_key_down(pygame.K_LEFT) or input.is_key_down(pygame.K_a))
+    ship.moving_up = bool(input.is_key_down(pygame.K_UP) or input.is_key_down(pygame.K_w))
+    ship.moving_down = bool(input.is_key_down(pygame.K_DOWN) or input.is_key_down(pygame.K_s))
 
     if input.is_key_down(pygame.K_ESCAPE):
         sys.exit()
@@ -191,6 +191,7 @@ def update_screen(
     bullets,
     play_button,
     credits_button,
+    quit_button,
     back_button,
     screen_bg,
     screen_bg_2,
@@ -235,6 +236,7 @@ def update_screen(
     # Draw the play button.
     play_button.update()
     credits_button.update()
+    quit_button.update()
 
     if stats.credits_active:
         back_button.update()

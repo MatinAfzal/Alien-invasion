@@ -21,12 +21,10 @@ class Scoreboard(pygame.sprite.Sprite):
 
     def update(self) -> None:
         """Render the score image."""
-        self.score_image: pygame.Surface = settings.FONT.render(str(self.stats.score).zfill(4), 1, TEXT_COLOR)
-        self.score_rect: pygame.Rect = self.score_image.get_rect(
-            topright=(self.screen.get_rect().right - 20, 20),
+        self.image: pygame.Surface = settings.FONT.render(str(self.stats.score).zfill(4), 1, TEXT_COLOR)
+        self.rect: pygame.Rect = self.image.get_rect(
+            topright=(self.screen.get_rect().right - 20, 32 - settings.FONT_ACCENT // 2),
         )
-        self.image: pygame.Surface = self.score_image
-        self.rect: pygame.Rect = self.score_rect
 
     def show(self) -> None:
         """Draw the score on screen."""
