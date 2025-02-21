@@ -1,5 +1,4 @@
-"""
-Implement a button class for a Pygame-based UI.
+"""Implement a button class for a Pygame-based UI.
 
 Provides a simple button with elevation, hover effect, and click handling.
 """

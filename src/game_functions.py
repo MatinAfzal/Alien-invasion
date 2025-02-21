@@ -115,39 +115,18 @@ def update_game_sprites(
     update_shields(ship, shields, health)
 
 
-def check_events(ai_settings, input, screen, stats, ship, bullets):
+def check_events(ai_settings, screen, stats, ship, bullets):
     """Respond to key presses and mouse events."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-    check_key_events(input, ship)
-    check_mouse_events(ai_settings, input, screen, stats, ship, bullets)
+    check_mouse_events(ai_settings, screen, stats, ship, bullets)
 
 
-def check_key_events(input, ship):
-    """Handle key down/up"""
-
-    if input.is_key_pressed(pygame.K_q):
-        pygame.quit()
-        sys.exit()
-
-    ship.moving_right = bool(input.is_key_down(pygame.K_RIGHT) or input.is_key_down(pygame.K_d))
-    ship.moving_left = bool(input.is_key_down(pygame.K_LEFT) or input.is_key_down(pygame.K_a))
-    ship.moving_up = bool(input.is_key_down(pygame.K_UP) or input.is_key_down(pygame.K_w))
-    ship.moving_down = bool(input.is_key_down(pygame.K_DOWN) or input.is_key_down(pygame.K_s))
-
-    if input.is_key_down(pygame.K_ESCAPE):
-        sys.exit()
-
-
-def check_mouse_events(ai_settings, input, screen, stats, ship, bullets):
+def check_mouse_events(ai_settings, screen, stats, ship, bullets):
     """Handle mouse button press and movement."""
-
-    if input.is_mouse_button_pressed(0):
-        if stats.game_active:
-            fire_bullet(ship, bullets)
 
 
 def run_play_button(ai_settings, stats, ship, aliens, cargoes, bullets, health):
@@ -156,7 +135,7 @@ def run_play_button(ai_settings, stats, ship, aliens, cargoes, bullets, health):
     ai_settings.initialize_dynamic_settings()
 
     # Hide the mouse cursor.
-    pygame.mouse.set_visible(False)
+    # pygame.mouse.set_visible(False)
     # Reset the game statistics.
     stats.reset()
     stats.game_active = True
@@ -225,7 +204,7 @@ def update_screen(
     for shield in shields.sprites():
         shield.draw()
 
-    ship.bltime()
+    ship.draw()
     aliens.draw(screen)
     cargoes.draw(screen)
     health.draw()
