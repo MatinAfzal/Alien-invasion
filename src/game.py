@@ -1,15 +1,11 @@
 import sys
-from dataclasses import dataclass
 
 import inject
 import pygame
 
 from src import settings
-
-
-@dataclass
-class SpritesManager:
-    sprites = pygame.sprite.Group()
+from src.scenes.game_scene import GameScene
+from src.sprite_manager import SpritesManager
 
 
 class Game:
@@ -26,17 +22,15 @@ class Game:
         pygame.display.set_caption("Alien Invasion")
         self.clock = pygame.time.Clock()
 
+        self.scene = GameScene()
+
     def run(self) -> None:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            dt: float = self.clock.tick(60) / 1000
-            pygame.display.update()
 
-    def updateSprites(self) -> None:
-        self.sprite_manager.sprites.update()
-        self.sprite_manager.sprites.draw(pygame.display.get_surface())
-        for sprite in self.sprite_manager.sprites:
-            sprite.draw()
+            dt: float = self.clock.tick(120) / 1000
+            self.scene.run(dt)
+            pygame.display.update()
