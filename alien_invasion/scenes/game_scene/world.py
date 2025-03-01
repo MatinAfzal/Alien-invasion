@@ -6,10 +6,7 @@ from alien_invasion import settings
 class World(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.image = pygame.transform.scale(
-            pygame.image.load(settings.ASSETS_DIR / "images" / "bg.png"),
-            (640, 640),
-        ).convert()
+        self.image = pygame.transform.scale(pygame.image.load(settings.ASSETS_DIR / "bg.png"), (640, 640)).convert()
         self.rect = self.image.get_rect(topleft=(0, 0))
         self.display_surf: pygame.Surface | None = pygame.display.get_surface()
 

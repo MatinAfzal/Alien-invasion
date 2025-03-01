@@ -18,11 +18,7 @@ class GameScene:
         self.world = World()
 
         self.player: Player = PlayerFactory(
-            SpriteAnimationFactory().load_from_sheet_file(
-                settings.ASSETS_DIR / "sprites" / "ship.png",
-                1,
-                1,
-            ),
+            SpriteAnimationFactory().load_from_sheet_file(settings.ASSETS_DIR / "ship.png", 1, 1),
         ).create(pygame.Vector2(640, 360))
         self.all_sprites.add(self.player)
 
