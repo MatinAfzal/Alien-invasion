@@ -1,10 +1,11 @@
 import math
+from dataclasses import dataclass
 
 import inject
 import pygame
 
 from src import settings
-from src.entities.sprites import Sprite
+from src.entities.sprites import Sprite, SpriteAnimation
 from src.entities.sprites.bullet import BulletFactory
 from src.game_state import GameState
 from src.sprite_manager import SpritesManager
@@ -47,7 +48,7 @@ class Player(Sprite):
 
     def fire(self) -> None:
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
-        sprite_manager.add(BulletFactory.create(self.pos, self.angle % 360))
+        sprite_manager.add(BulletFactory().create(self.pos, self.angle % 360))
 
     def update(self, dt: float) -> None:
         super().update(dt)
@@ -55,11 +56,18 @@ class Player(Sprite):
         game_state.player_position = self.pos
 
 
+@dataclass
 class PlayerFactory:
-    SPEED = 300
-    IMAGE_PATH = settings.ASSETS_DIR / "sprites" / "ship.png"
-    LAYER = settings.GameLayer.GROUND.value
+    animation: SpriteAnimation
+    speed: int = 300
+    image_path: settings.Path = settings.ASSETS_DIR / "sprites" / "ship.png"
+    layer: int = settings.GameLayer.GROUND.value
 
-    @classmethod
-    def create(cls, pos: pygame.Vector2) -> Player:
-        return Player(cls.LAYER, pos, cls.IMAGE_PATH, (200, 200), pygame.Vector2(cls.SPEED, cls.SPEED))
+    def create(self, pos: pygame.Vector2) -> Player:
+        return Player(
+            self.layer,
+            pos,
+            self.animation,
+            (200, 200),
+            pygame.Vector2(self.speed, self.speed),
+        )

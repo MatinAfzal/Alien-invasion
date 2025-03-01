@@ -1,25 +1,39 @@
 import math
-from pathlib import Path
+from dataclasses import dataclass
 
-from pygame import Vector2
+import pygame
 
 from src import settings
-from src.entities.sprites import Sprite
+from src.entities.sprites import Sprite, SpriteAnimation, SpriteAnimationFactory
 
 
 class Bullet(Sprite): ...
 
 
+@dataclass
 class BulletFactory:
-    SPEED = 1000
-    IMAGE_PATH: Path = settings.ASSETS_DIR / "sprites" / "bullet.png"
-    LAYER = settings.GameLayer.GROUND.value
+    speed: int = 1000
+    layer: int = settings.GameLayer.GROUND.value
 
-    @classmethod
-    def create(cls, pos: Vector2, angle: float) -> Bullet:
+    def __post_init__(self) -> None:
+        self.animation: SpriteAnimation = SpriteAnimationFactory().load_from_sheet_file(
+            settings.ASSETS_DIR / "bullet-sheet.png",
+            4,
+            1,
+        )
+
+    def create(self, pos: pygame.Vector2, angle: float) -> Bullet:
         angle -= 180
-        direction = Vector2(math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-        speed = Vector2(abs(direction.x * cls.SPEED), abs(direction.y * cls.SPEED))
+        direction = pygame.Vector2(math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+        speed = pygame.Vector2(abs(direction.x * self.speed), abs(direction.y * self.speed))
         direction.x = math.copysign(1, direction.x) if direction.x != 0 else 0
         direction.y = -math.copysign(1, direction.y) if direction.y != 0 else 0
-        return Bullet(cls.LAYER, pos, cls.IMAGE_PATH, (40, 40), speed, angle + 180, direction)
+        return Bullet(
+            self.layer,
+            pos,
+            self.animation,
+            (64, 64),
+            speed,
+            angle + 180,
+            direction,
+        )

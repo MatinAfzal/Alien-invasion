@@ -14,50 +14,53 @@ class SpriteAnimation:
     loops: int | None = None
 
 
+@dataclass
 class SpriteAnimationFactory:
-    @staticmethod
-    def load_from_folder(path: Path, fps: int = 1, loops: int = -1) -> SpriteAnimation:
+    fps: int = 4
+    loops: int = -1
+
+    def load_from_folder(self, path: Path) -> SpriteAnimation:
         return SpriteAnimation(
             [pygame.image.load(Path.resolve(file)).convert_alpha() for file in path.iterdir()],
-            fps,
-            loops,
+            self.fps,
+            self.loops,
         )
 
-    @staticmethod
-    def load_from_sheet_file(path: Path, cols: int, rows: int, fps: int = 1, loops: int = -1) -> SpriteAnimation:
-        return SpriteAnimation(load_surfaces_from_sheet(path, cols, rows), fps, loops)
+    def load_from_sheet_file(self, path: Path, cols: int, rows: int) -> SpriteAnimation:
+        return SpriteAnimation(load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops)
 
 
 @dataclass
 class Sprite:
     z: int
     init_pos: pygame.math.Vector2
-    image_path: Path
-    scale: tuple[int, int]
+    animation: SpriteAnimation
+    size: tuple[int, int]
     speed: pygame.Vector2
     angle: float = 0
     direction: pygame.Vector2 = field(default_factory=pygame.Vector2)
 
+    frame_idx: float = field(default=0, init=False)
+    timers: list[Timer] = field(default_factory=list, init=False)
+
     def __post_init__(self) -> None:
         super().__init__()
-        self.original_image: pygame.Surface = pygame.transform.scale(pygame.image.load(self.image_path), self.scale)
-        self.image: pygame.Surface = self.original_image.copy()
         self.rect: pygame.Rect = self.image.get_rect(center=self.init_pos)
         self.pos: pygame.Vector2 = self.init_pos.copy()
 
-        self.animation: SpriteAnimation | None = None
-        self.framd_idx: float = 0
-
-        self.__timers: list[Timer] = []
-
         self.setup()
+
+    @property
+    def image(self) -> pygame.Surface:
+        image: pygame.Surface = self.animation.sprites[int(self.frame_idx)]
+        image = pygame.transform.scale(image, self.size)
+        return pygame.transform.rotate(image, self.angle)
 
     def setup(self) -> None: ...
 
     def input(self, dt: float) -> None: ...
 
     def move(self, dt: float) -> None:
-        self.image = pygame.transform.rotate(self.original_image, self.angle)
         if self.direction.magnitude():
             self.direction: pygame.Vector2 = self.direction.normalize()
         self.pos.x += self.direction.x * self.speed.x * dt
@@ -66,10 +69,10 @@ class Sprite:
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def register_timer(self, timer: Timer) -> None:
-        self.__timers.append(timer)
+        self.timers.append(timer)
 
     def update_timers(self) -> None:
-        for timer in self.__timers:
+        for timer in self.timers:
             timer.update()
 
     def change_animation(self, animation: SpriteAnimation) -> None:
@@ -79,7 +82,7 @@ class Sprite:
         if not self.animation:
             return
 
-        self.framd_idx = (self.framd_idx + self.animation.fps * dt) % len(self.animation.sprites)
+        self.frame_idx = (self.frame_idx + self.animation.fps * dt) % len(self.animation.sprites)
 
     def update(self, dt: float) -> None:
         self.update_timers()
