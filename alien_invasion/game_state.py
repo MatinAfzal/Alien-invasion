@@ -5,4 +5,5 @@ import pygame
 
 @dataclass
 class GameState:
-    player_position: pygame.Vector2 = field(default_factory=lambda: pygame.Vector2(0, 0))
+    player_position: pygame.Vector2 = field(default_factory=pygame.Vector2)
+    camera_offset: pygame.Vector2 = field(default_factory=pygame.Vector2)

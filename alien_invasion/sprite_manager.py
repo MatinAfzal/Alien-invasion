@@ -39,3 +39,6 @@ class SpritesManager:
 
     def __sort_sprites(self) -> None:
         self.sprites = sorted(self.sprites, key=lambda x: (x.z, x.rect.center))
+
+    def clear(self) -> None:
+        self.sprites = []
