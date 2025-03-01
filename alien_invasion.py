@@ -1,16 +1,16 @@
 import inject
 
 from src.game import Game
-from src.game_stats import GameStats
+from src.game_state import GameState
 from src.sprite_manager import SpritesManager
 
 sm = SpritesManager()
-stats = GameStats()
+state = GameState()
 
 
 def config(binder: inject.Binder) -> None:
     binder.bind(SpritesManager, sm)
-    binder.bind(GameStats, stats)
+    binder.bind(GameState, state)
 
 
 inject.configure(config)

@@ -1,20 +1,34 @@
-from typing import Any
+from dataclasses import dataclass
 
+import inject
 import pygame
 
 from src import settings
+from src.entities.sprites import Sprite
 from src.entities.sprites.player import Player
 from src.scenes.game_scene.world import World
+from src.sprite_manager import SpritesManager
 
 
-class CameraGroup(pygame.sprite.Group):  # type: ignore  # noqa: PGH003
-    def __init__(self, *sprites: pygame.sprite.Sprite) -> None:
-        super().__init__(*sprites)  # type: ignore  # noqa: PGH003
-        self.offset = pygame.math.Vector2()
-        self.target_offset = pygame.math.Vector2()
-        self.smooth_factor = 0.05
+@dataclass
+class CameraGroup:
+    offset = pygame.math.Vector2()
+    target_offset = pygame.math.Vector2()
+    smooth_factor = 0.05
 
-    def custom_draw(self, player: Player, surf: pygame.Surface, world: World) -> None:
+    def add(self, sprite: Sprite) -> None:
+        sprite_manager: SpritesManager = inject.instance(SpritesManager)
+
+        sprite_manager.add(sprite)
+
+    def update(self, dt: float) -> None:
+        sprite_manager: SpritesManager = inject.instance(SpritesManager)
+
+        sprite_manager.update(dt)
+
+    def draw(self, player: Player, surf: pygame.Surface, world: World) -> None:
+        sprite_manager: SpritesManager = inject.instance(SpritesManager)
+
         self.target_offset.x = player.rect.centerx - settings.SCREEN_WIDTH / 2
         self.target_offset.y = player.rect.centery - settings.SCREEN_HEIGHT / 2
 
@@ -23,8 +37,7 @@ class CameraGroup(pygame.sprite.Group):  # type: ignore  # noqa: PGH003
 
         world.draw(self.offset)
 
-        for sprite in self.sprites():
-            # offset_rect: pygame.Rect = sprite.rect.copy()
-            # offset_rect.center -= self.offset
-            # surf.blit(sprite.image, offset_rect)
-            sprite.offset = self.offset
+        for sprite in sprite_manager.sprites:
+            offset_rect: pygame.Rect = sprite.rect.copy()
+            offset_rect.center -= self.offset
+            surf.blit(sprite.image, offset_rect)

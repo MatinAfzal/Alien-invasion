@@ -1,16 +1,12 @@
 import sys
 
-import inject
 import pygame
 
 from src import settings
 from src.scenes.game_scene import GameScene
-from src.sprite_manager import SpritesManager
 
 
 class Game:
-    sprite_manager: SpritesManager = inject.attr(SpritesManager)
-
     def __init__(self) -> None:
         pygame.init()
         self.display: pygame.Surface = pygame.display.set_mode(
