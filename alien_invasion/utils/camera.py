@@ -1,6 +1,6 @@
 import copy
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import inject
 import pygame
@@ -10,13 +10,15 @@ from alien_invasion.entities.sprites import Sprite
 from alien_invasion.utils.game_state import GameState
 from alien_invasion.utils.sprite_manager import SpritesManager
 
+SMOOTH_FACTOR = 0.05
+
 
 @dataclass
 class CameraGroup:
     bg: typing.Any
-    offset = pygame.math.Vector2()
-    target_offset = pygame.math.Vector2()
-    smooth_factor = 0.05
+    offset: pygame.Vector2 = field(default_factory=pygame.math.Vector2, init=False)
+    target_offset: pygame.Vector2 = field(default_factory=pygame.math.Vector2, init=False)
+    smooth_factor: float = field(default=SMOOTH_FACTOR, init=False)
 
     def update(self, target: Sprite) -> None:
         game_state: GameState = inject.instance(GameState)
