@@ -1,10 +1,10 @@
-import dataclasses
 from collections.abc import Callable
+from dataclasses import dataclass
 
 import pygame
 
 
-@dataclasses.dataclass
+@dataclass
 class Timer:
     duration: int
     on_expire: Callable[[], None] | None = None

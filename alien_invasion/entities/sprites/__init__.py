@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pygame
 
-from src.utils import load_surfaces_from_sheet
-from src.utils.timer import Timer
+from alien_invasion.utils import load_surfaces_from_sheet
+from alien_invasion.utils.timer import Timer
 
 
 @dataclass

@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 import pygame
 
-from src import settings
-from src.entities.sprites import Sprite, SpriteAnimation, SpriteAnimationFactory
+from alien_invasion import settings
+from alien_invasion.entities.sprites import Sprite, SpriteAnimation, SpriteAnimationFactory
 
 
 class Bullet(Sprite): ...

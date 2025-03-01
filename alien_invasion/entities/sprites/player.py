@@ -4,12 +4,12 @@ from dataclasses import dataclass
 import inject
 import pygame
 
-from src import settings
-from src.entities.sprites import Sprite, SpriteAnimation
-from src.entities.sprites.bullet import BulletFactory
-from src.game_state import GameState
-from src.sprite_manager import SpritesManager
-from src.utils.timer import Timer
+from alien_invasion import settings
+from alien_invasion.entities.sprites import Sprite, SpriteAnimation
+from alien_invasion.entities.sprites.bullet import BulletFactory
+from alien_invasion.game_state import GameState
+from alien_invasion.sprite_manager import SpritesManager
+from alien_invasion.utils.timer import Timer
 
 
 class Player(Sprite):

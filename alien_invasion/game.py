@@ -2,8 +2,8 @@ import sys
 
 import pygame
 
-from src import settings
-from src.scenes.game_scene import GameScene
+from alien_invasion import settings
+from alien_invasion.scenes.game_scene import GameScene
 
 
 class Game:

@@ -3,11 +3,11 @@ from dataclasses import dataclass
 import inject
 import pygame
 
-from src import settings
-from src.entities.sprites import Sprite
-from src.entities.sprites.player import Player
-from src.scenes.game_scene.world import World
-from src.sprite_manager import SpritesManager
+from alien_invasion import settings
+from alien_invasion.entities.sprites import Sprite
+from alien_invasion.entities.sprites.player import Player
+from alien_invasion.scenes.game_scene.world import World
+from alien_invasion.sprite_manager import SpritesManager
 
 
 @dataclass

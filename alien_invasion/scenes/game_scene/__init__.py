@@ -2,11 +2,11 @@ from dataclasses import dataclass
 
 import pygame
 
-from src import settings
-from src.entities.sprites import SpriteAnimationFactory
-from src.entities.sprites.player import Player, PlayerFactory
-from src.scenes.game_scene.world import World
-from src.utils.camera import CameraGroup
+from alien_invasion import settings
+from alien_invasion.entities.sprites import SpriteAnimationFactory
+from alien_invasion.entities.sprites.player import Player, PlayerFactory
+from alien_invasion.scenes.game_scene.world import World
+from alien_invasion.utils.camera import CameraGroup
 
 
 @dataclass
@@ -28,4 +28,5 @@ class GameScene:
 
     def run(self, dt: float) -> None:
         self.all_sprites.update(dt)
-        self.all_sprites.draw(self.player, self.display_surf, self.world)
+        if self.display_surf:
+            self.all_sprites.draw(self.player, self.display_surf, self.world)

@@ -1,13 +1,13 @@
 from pathlib import Path
+
 import pygame
 
 
 def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[pygame.Surface]:
     sheet: pygame.Surface = pygame.image.load(path).convert_alpha()
 
-    sheet_width, sheet_height = sheet.get_size()
-    frame_width: int = sheet_width // cols
-    frame_height: int = sheet_height // rows
+    frame_width: int = sheet.get_size()[0] // cols
+    frame_height: int = sheet.get_size()[1] // rows
 
     surfaces: list[pygame.Surface] = []
 
