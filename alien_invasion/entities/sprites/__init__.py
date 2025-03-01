@@ -36,7 +36,7 @@ class Sprite:
     init_pos: pygame.math.Vector2
     animation: SpriteAnimation
     size: tuple[int, int]
-    speed: pygame.Vector2
+    init_speed: pygame.Vector2
     angle: float = 0
     direction: pygame.Vector2 = field(default_factory=pygame.Vector2)
 
@@ -45,6 +45,7 @@ class Sprite:
 
     def __post_init__(self) -> None:
         super().__init__()
+        self.speed: pygame.Vector2 = self.init_speed
         self.rect: pygame.Rect = self.image.get_rect(center=self.init_pos)
         self.pos: pygame.Vector2 = self.init_pos.copy()
 

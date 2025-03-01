@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import pygame
@@ -18,3 +19,7 @@ def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[pygame.Su
             surfaces.append(frame_surface)
 
     return surfaces
+
+
+def get_direction_by_angle(angle: float) -> pygame.Vector2:
+    return pygame.Vector2(math.cos(math.radians(angle)), math.sin(math.radians(angle)))

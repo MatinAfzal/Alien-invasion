@@ -5,7 +5,7 @@ import inject
 import pygame
 
 from alien_invasion import settings
-from alien_invasion.entities.sprites import Sprite, SpriteAnimation
+from alien_invasion.entities.sprites import Sprite, SpriteAnimationFactory
 from alien_invasion.entities.sprites.bullet import BulletFactory
 from alien_invasion.game_state import GameState
 from alien_invasion.sprite_manager import SpritesManager
@@ -58,16 +58,18 @@ class Player(Sprite):
 
 @dataclass
 class PlayerFactory:
-    animation: SpriteAnimation
     speed: int = 300
-    image_path: settings.Path = settings.ASSETS_DIR / "sprites" / "ship.png"
     layer: int = settings.GameLayer.GROUND.value
 
     def create(self, pos: pygame.Vector2) -> Player:
         return Player(
             self.layer,
             pos,
-            self.animation,
+            SpriteAnimationFactory().load_from_sheet_file(
+                settings.ASSETS_DIR / "ship.png",
+                1,
+                1,
+            ),
             (200, 200),
             pygame.Vector2(self.speed, self.speed),
         )
