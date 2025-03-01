@@ -5,7 +5,6 @@ import pygame
 
 from alien_invasion import settings
 from alien_invasion.entities.sprites import Sprite, SpriteAnimation, SpriteAnimationFactory
-from alien_invasion.utils import get_direction_by_angle
 
 
 class Bullet(Sprite): ...
@@ -25,7 +24,10 @@ class BulletFactory:
 
     def create(self, pos: pygame.Vector2, angle: float) -> Bullet:
         angle -= 180
-        direction: pygame.Vector2 = get_direction_by_angle(angle)
+        direction: pygame.Vector2 = pygame.Vector2(
+            math.cos(math.radians(angle)),
+            math.sin(math.radians(angle)),
+        )
         speed = pygame.Vector2(
             abs(direction.x * self.speed),
             abs(direction.y * self.speed),

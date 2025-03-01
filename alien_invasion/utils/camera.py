@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 
 import inject
@@ -38,6 +39,6 @@ class CameraGroup:
         world.draw(self.offset)
 
         for sprite in sprite_manager.sprites:
-            offset_rect: pygame.Rect = sprite.rect.copy()
+            offset_rect: pygame.Rect = copy.copy(sprite.rect.copy())
             offset_rect.center -= self.offset
             surf.blit(sprite.image, offset_rect)

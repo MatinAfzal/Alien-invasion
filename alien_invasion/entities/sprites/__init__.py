@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -34,7 +35,7 @@ class SpriteAnimationFactory:
 class Sprite:
     z: int
     init_pos: pygame.math.Vector2
-    animation: SpriteAnimation
+    init_animation: SpriteAnimation
     size: tuple[int, int]
     init_speed: pygame.Vector2
     angle: float = 0
@@ -45,9 +46,10 @@ class Sprite:
 
     def __post_init__(self) -> None:
         super().__init__()
+        self.animation: SpriteAnimation = copy.deepcopy(self.init_animation)
         self.speed: pygame.Vector2 = self.init_speed
         self.rect: pygame.Rect = self.image.get_rect(center=self.init_pos)
-        self.pos: pygame.Vector2 = self.init_pos.copy()
+        self.pos: pygame.Vector2 = copy.copy(self.init_pos)
 
         self.setup()
 

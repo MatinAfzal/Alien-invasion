@@ -39,10 +39,10 @@ class Player(Sprite):
 
         mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
 
-        x_dist: float = mouse_pos.x - settings.SCREEN_WIDTH / 2
-        y_dist: float = -(mouse_pos.y - settings.SCREEN_HEIGHT / 2)
+        delta_x: float = mouse_pos.x - settings.SCREEN_WIDTH / 2
+        delta_y: float = -(mouse_pos.y - settings.SCREEN_HEIGHT / 2)
 
-        target_angle: float = math.degrees(math.atan2(y_dist, x_dist))
+        target_angle: float = math.degrees(math.atan2(delta_y, delta_x))
         diff: float = (target_angle - self.angle) % 360 - 180
         self.angle += diff * 8 * dt
 
