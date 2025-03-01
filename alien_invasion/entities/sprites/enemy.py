@@ -6,7 +6,7 @@ import pygame
 
 from alien_invasion import settings
 from alien_invasion.entities.sprites import Sprite, SpriteAnimationFactory
-from alien_invasion.game_state import GameState
+from alien_invasion.utils.game_state import GameState
 
 
 class Enemy(Sprite):
@@ -38,7 +38,7 @@ class Enemy(Sprite):
 @dataclass
 class EnemyFactory:
     speed = 500
-    layer: int = settings.GameLayer.GROUND.value
+    layer: int = settings.Layer.ENTITIES.value
 
     def create(self, pos: pygame.Vector2) -> Enemy:
         return Enemy(

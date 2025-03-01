@@ -1,4 +1,5 @@
 import copy
+import typing
 from dataclasses import dataclass
 
 import inject
@@ -6,14 +7,13 @@ import pygame
 
 from alien_invasion import settings
 from alien_invasion.entities.sprites import Sprite
-from alien_invasion.game_state import GameState
-from alien_invasion.scenes.game_scene.world import World
-from alien_invasion.sprite_manager import SpritesManager
+from alien_invasion.utils.game_state import GameState
+from alien_invasion.utils.sprite_manager import SpritesManager
 
 
 @dataclass
 class CameraGroup:
-    bg: World
+    bg: typing.Any
     offset = pygame.math.Vector2()
     target_offset = pygame.math.Vector2()
     smooth_factor = 0.05

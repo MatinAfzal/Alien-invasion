@@ -13,7 +13,7 @@ class Bullet(Sprite): ...
 @dataclass
 class BulletFactory:
     speed: int = 1000
-    layer: int = settings.GameLayer.GROUND.value
+    layer: int = settings.Layer.ENTITIES.value
 
     def __post_init__(self) -> None:
         self.animation: SpriteAnimation = SpriteAnimationFactory().load_from_sheet_file(

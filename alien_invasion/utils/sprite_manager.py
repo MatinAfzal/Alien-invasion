@@ -4,7 +4,7 @@ import inject
 
 from alien_invasion import settings
 from alien_invasion.entities.sprites import Sprite
-from alien_invasion.game_state import GameState
+from alien_invasion.utils.game_state import GameState
 
 
 @dataclass
