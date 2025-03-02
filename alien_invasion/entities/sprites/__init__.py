@@ -1,5 +1,5 @@
 import copy
-from dataclasses import dataclass, field
+import dataclasses
 from pathlib import Path
 
 import pygame
@@ -7,30 +7,37 @@ import pygame
 from alien_invasion.utils import load_surfaces_from_sheet
 
 
-@dataclass
+@dataclasses.dataclass
 class SpriteAnimation:
-    sprites: list[pygame.Surface] = field(default_factory=list)
+    sprites: list[pygame.Surface] = dataclasses.field(default_factory=list)
     fps: int = 1
     loops: int | None = None
 
 
-@dataclass
+@dataclasses.dataclass
 class SpriteAnimationFactory:
     fps: int = 4
     loops: int = -1
 
     def load_from_folder(self, path: Path) -> SpriteAnimation:
         return SpriteAnimation(
-            [pygame.image.load(Path.resolve(file)).convert_alpha() for file in path.iterdir()],
+            [
+                pygame.image.load(Path.resolve(file)).convert_alpha()
+                for file in path.iterdir()
+            ],
             self.fps,
             self.loops,
         )
 
-    def load_from_sheet_file(self, path: Path, cols: int, rows: int) -> SpriteAnimation:
-        return SpriteAnimation(load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops)
+    def load_from_sheet_file(
+        self, path: Path, cols: int, rows: int
+    ) -> SpriteAnimation:
+        return SpriteAnimation(
+            load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops
+        )
 
 
-@dataclass
+@dataclasses.dataclass
 class Sprite:
     z: int
     init_pos: pygame.math.Vector2
@@ -38,9 +45,11 @@ class Sprite:
     size: tuple[int, int]
     init_speed: pygame.Vector2
     angle: float = 0
-    direction: pygame.Vector2 = field(default_factory=pygame.Vector2)
+    direction: pygame.Vector2 = dataclasses.field(
+        default_factory=pygame.Vector2,
+    )
 
-    frame_idx: float = field(default=0, init=False)
+    frame_idx: float = dataclasses.field(default=0, init=False)
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -76,7 +85,9 @@ class Sprite:
         if not self.animation:
             return
 
-        self.frame_idx = (self.frame_idx + self.animation.fps * dt) % len(self.animation.sprites)
+        self.frame_idx = (self.frame_idx + self.animation.fps * dt) % len(
+            self.animation.sprites
+        )
 
     def update(self, dt: float) -> None:
         self.input(dt)

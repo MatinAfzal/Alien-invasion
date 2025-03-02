@@ -1,9 +1,13 @@
-from dataclasses import dataclass, field
+import dataclasses
 
 import pygame
 
 
-@dataclass
+@dataclasses.dataclass
 class GameState:
-    player_position: pygame.Vector2 = field(default_factory=pygame.Vector2)
-    camera_offset: pygame.Vector2 = field(default_factory=pygame.Vector2)
+    player_position: pygame.Vector2 = dataclasses.field(
+        default_factory=pygame.Vector2,
+    )
+    camera_offset: pygame.Vector2 = dataclasses.field(
+        default_factory=pygame.Vector2,
+    )

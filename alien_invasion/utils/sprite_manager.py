@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+import dataclasses
 
 import inject
 
@@ -7,9 +7,9 @@ from alien_invasion.entities.sprites import Sprite
 from alien_invasion.utils.game_state import GameState
 
 
-@dataclass
+@dataclasses.dataclass
 class SpritesManager:
-    sprites: list[Sprite] = field(default_factory=list)
+    sprites: list[Sprite] = dataclasses.field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.__sort_sprites()

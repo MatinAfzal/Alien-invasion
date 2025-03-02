@@ -1,17 +1,17 @@
-from dataclasses import dataclass
+import dataclasses
 
 import inject
 import pygame
 
 from alien_invasion import settings
 from alien_invasion.entities.sprites.enemy import EnemyFactory
-from alien_invasion.entities.sprites.player import Player, PlayerFactory
-from alien_invasion.utils.camera import CameraGroup
+from alien_invasion.entities.sprites.player import PlayerFactory
+from alien_invasion.scenes import Scene
 from alien_invasion.utils.game_state import GameState
 from alien_invasion.utils.sprite_manager import SpritesManager
 
 
-@dataclass
+@dataclasses.dataclass
 class SpaceBG:
     def __post_init__(self) -> None:
         self.image: pygame.Surface = pygame.transform.scale(
@@ -49,24 +49,15 @@ class SpaceBG:
                 )
 
 
-@dataclass
-class GameScene:
+class GameScene(Scene):
+    def __init__(self) -> None:
+        super().__init__(
+            PlayerFactory().create(pygame.Vector2(640, 360)),
+            SpaceBG(),
+        )
+
     def __post_init__(self) -> None:
+        super().__post_init__()
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
-
-        sprite_manager.clear()
-
-        self.camera = CameraGroup(SpaceBG())
-
-        self.player: Player = PlayerFactory().create(pygame.Vector2(640, 360))
-        sprite_manager.add(self.player)
 
         sprite_manager.add(EnemyFactory().create(pygame.Vector2(200, 200)))
-
-    def run(self, dt: float) -> None:
-        sprite_manager: SpritesManager = inject.instance(SpritesManager)
-
-        sprite_manager.update(dt)
-
-        self.camera.update(self.player)
-        self.camera.draw()

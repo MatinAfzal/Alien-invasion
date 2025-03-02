@@ -1,5 +1,5 @@
+import dataclasses
 import math
-from dataclasses import dataclass
 
 import pygame
 
@@ -14,7 +14,7 @@ from alien_invasion.entities.sprites import (
 class Bullet(Sprite): ...
 
 
-@dataclass
+@dataclasses.dataclass
 class BulletFactory:
     speed: int = 1000
     layer: int = settings.Layer.ENTITIES.value

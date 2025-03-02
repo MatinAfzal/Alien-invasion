@@ -1,5 +1,5 @@
+import dataclasses
 import math
-from dataclasses import dataclass
 from threading import Timer
 
 import inject
@@ -56,7 +56,7 @@ class Player(Sprite):
         game_state.player_position = self.pos
 
 
-@dataclass
+@dataclasses.dataclass
 class PlayerFactory:
     speed: int = 300
     layer: int = settings.Layer.ENTITIES.value

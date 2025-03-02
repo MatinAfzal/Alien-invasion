@@ -1,5 +1,5 @@
+import dataclasses
 import math
-from dataclasses import dataclass
 
 import inject
 import pygame
@@ -35,7 +35,7 @@ class Enemy(Sprite):
         self.angle = target_angle - 180
 
 
-@dataclass
+@dataclasses.dataclass
 class EnemyFactory:
     speed = 500
     layer: int = settings.Layer.ENTITIES.value
