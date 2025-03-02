@@ -5,7 +5,6 @@ from pathlib import Path
 import pygame
 
 from alien_invasion.utils import load_surfaces_from_sheet
-from alien_invasion.utils.timer import Timer
 
 
 @dataclass
@@ -42,7 +41,6 @@ class Sprite:
     direction: pygame.Vector2 = field(default_factory=pygame.Vector2)
 
     frame_idx: float = field(default=0, init=False)
-    timers: list[Timer] = field(default_factory=list, init=False)
 
     def __post_init__(self) -> None:
         super().__init__()
@@ -71,13 +69,6 @@ class Sprite:
         self.rect.center = (int(self.pos.x), int(self.pos.y))
         self.rect = self.image.get_rect(center=self.rect.center)
 
-    def register_timer(self, timer: Timer) -> None:
-        self.timers.append(timer)
-
-    def update_timers(self) -> None:
-        for timer in self.timers:
-            timer.update()
-
     def change_animation(self, animation: SpriteAnimation) -> None:
         self.animation = animation
 
@@ -88,7 +79,6 @@ class Sprite:
         self.frame_idx = (self.frame_idx + self.animation.fps * dt) % len(self.animation.sprites)
 
     def update(self, dt: float) -> None:
-        self.update_timers()
         self.input(dt)
         self.move(dt)
         self.animate(dt)

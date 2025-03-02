@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass
+from threading import Timer
 
 import inject
 import pygame
@@ -9,13 +10,11 @@ from alien_invasion.entities.sprites import Sprite, SpriteAnimationFactory
 from alien_invasion.entities.sprites.bullet import BulletFactory
 from alien_invasion.utils.game_state import GameState
 from alien_invasion.utils.sprite_manager import SpritesManager
-from alien_invasion.utils.timer import Timer
 
 
 class Player(Sprite):
     def setup(self) -> None:
-        self.fire_timer = Timer(700)
-        self.register_timer(self.fire_timer)
+        self.can_shoot = True
 
     def input(self, dt: float) -> None:
         keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
@@ -33,8 +32,9 @@ class Player(Sprite):
         else:
             self.direction.x = 0
 
-        if pygame.mouse.get_pressed()[0] and not self.fire_timer.active:
-            self.fire_timer.activate()
+        if pygame.mouse.get_pressed()[0] and self.can_shoot:
+            self.can_shoot = False
+            Timer(0.7, lambda: setattr(self, "can_shoot", True)).start()
             self.fire()
 
         mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
