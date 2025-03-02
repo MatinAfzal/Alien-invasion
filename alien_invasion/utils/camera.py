@@ -16,8 +16,14 @@ SMOOTH_FACTOR = 0.05
 @dataclass
 class CameraGroup:
     bg: typing.Any
-    offset: pygame.Vector2 = field(default_factory=pygame.math.Vector2, init=False)
-    target_offset: pygame.Vector2 = field(default_factory=pygame.math.Vector2, init=False)
+    offset: pygame.Vector2 = field(
+        default_factory=pygame.math.Vector2,
+        init=False,
+    )
+    target_offset: pygame.Vector2 = field(
+        default_factory=pygame.math.Vector2,
+        init=False,
+    )
     smooth_factor: float = field(default=SMOOTH_FACTOR, init=False)
 
     def update(self, target: Sprite) -> None:
@@ -26,8 +32,12 @@ class CameraGroup:
         self.target_offset.x = target.rect.centerx - settings.SCREEN_WIDTH / 2
         self.target_offset.y = target.rect.centery - settings.SCREEN_HEIGHT / 2
 
-        self.offset.x += (self.target_offset.x - self.offset.x) * self.smooth_factor
-        self.offset.y += (self.target_offset.y - self.offset.y) * self.smooth_factor
+        self.offset.x += (
+            self.target_offset.x - self.offset.x
+        ) * self.smooth_factor
+        self.offset.y += (
+            self.target_offset.y - self.offset.y
+        ) * self.smooth_factor
 
         game_state.camera_offset = self.offset
 

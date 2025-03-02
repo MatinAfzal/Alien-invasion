@@ -4,7 +4,11 @@ from pathlib import Path
 import pygame
 
 
-def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[pygame.Surface]:
+def load_surfaces_from_sheet(
+    path: Path,
+    cols: int,
+    rows: int,
+) -> list[pygame.Surface]:
     sheet: pygame.Surface = pygame.image.load(path).convert_alpha()
 
     frame_width: int = sheet.get_size()[0] // cols
@@ -14,7 +18,12 @@ def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[pygame.Su
 
     for row in range(rows):
         for col in range(cols):
-            rect = pygame.Rect(col * frame_width, row * frame_height, frame_width, frame_height)
+            rect = pygame.Rect(
+                col * frame_width,
+                row * frame_height,
+                frame_width,
+                frame_height,
+            )
             frame_surface: pygame.Surface = copy.copy(sheet.subsurface(rect))
             surfaces.append(frame_surface)
 

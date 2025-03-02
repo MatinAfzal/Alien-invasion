@@ -25,11 +25,15 @@ class SpritesManager:
 
         for idx, sprite in enumerate(self.sprites):
             if not (
-                game_state.player_position.x - settings.SCREEN_WIDTH / 2 - offset
+                game_state.player_position.x
+                - settings.SCREEN_WIDTH / 2
+                - offset
                 < sprite.pos.x
                 < game_state.player_position.x + settings.SCREEN_WIDTH + offset
             ) or not (
-                game_state.player_position.y - settings.SCREEN_HEIGHT / 2 - offset
+                game_state.player_position.y
+                - settings.SCREEN_HEIGHT / 2
+                - offset
                 < sprite.pos.y
                 < game_state.player_position.y + settings.SCREEN_HEIGHT + offset
             ):

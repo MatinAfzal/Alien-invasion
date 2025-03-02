@@ -30,8 +30,16 @@ class SpaceBG:
         img_width: int = self.image.get_size()[0]
         img_height: int = self.image.get_size()[1]
 
-        for x in range(-img_width, settings.SCREEN_WIDTH + img_width, img_width):
-            for y in range(-img_height, settings.SCREEN_HEIGHT + img_height, img_height):
+        for x in range(
+            -img_width,
+            settings.SCREEN_WIDTH + img_width,
+            img_width,
+        ):
+            for y in range(
+                -img_height,
+                settings.SCREEN_HEIGHT + img_height,
+                img_height,
+            ):
                 display_surf.blit(
                     self.image,
                     (

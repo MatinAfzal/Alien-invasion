@@ -4,7 +4,11 @@ from dataclasses import dataclass
 import pygame
 
 from alien_invasion import settings
-from alien_invasion.entities.sprites import Sprite, SpriteAnimation, SpriteAnimationFactory
+from alien_invasion.entities.sprites import (
+    Sprite,
+    SpriteAnimation,
+    SpriteAnimationFactory,
+)
 
 
 class Bullet(Sprite): ...
@@ -16,10 +20,12 @@ class BulletFactory:
     layer: int = settings.Layer.ENTITIES.value
 
     def __post_init__(self) -> None:
-        self.animation: SpriteAnimation = SpriteAnimationFactory().load_from_sheet_file(
-            settings.ASSETS_DIR / "bullet-sheet.png",
-            4,
-            1,
+        self.animation: SpriteAnimation = (
+            SpriteAnimationFactory().load_from_sheet_file(
+                settings.ASSETS_DIR / "bullet-sheet.png",
+                4,
+                1,
+            )
         )
 
     def create(self, pos: pygame.Vector2, angle: float) -> Bullet:
