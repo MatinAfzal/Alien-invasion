@@ -1,12 +1,16 @@
-import dataclasses
-import math
+from dataclasses import dataclass
+from math import atan2, copysign, cos, degrees, radians, sin
+from typing import TYPE_CHECKING
 
 import inject
-import pygame
+from pygame.math import Vector2
 
-from alien_invasion import settings
-from alien_invasion.entities.sprites import Sprite, SpriteAnimationFactory
+from alien_invasion.entities.sprites import Animation, AnimationFactory, Sprite
+from alien_invasion.settings import ASSETS_DIR, Layer
 from alien_invasion.utils.game_state import GameState
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Enemy(Sprite):
@@ -17,38 +21,31 @@ class Enemy(Sprite):
         delta_x: float = game_state.player_position.x - self.pos.x
         delta_y: float = self.pos.y - game_state.player_position.y
 
-        target_angle: float = math.degrees(math.atan2(delta_y, delta_x))
+        target_angle: float = degrees(atan2(delta_y, delta_x))
 
-        direction = pygame.Vector2(
-            math.cos(math.radians(target_angle)),
-            math.sin(math.radians(target_angle)),
+        direction = Vector2(
+            cos(radians(target_angle)),
+            sin(radians(target_angle)),
         )
 
-        self.speed = pygame.Vector2(
+        self.speed = Vector2(
             abs(direction.x * self.init_speed.x),
             abs(direction.y * self.init_speed.y),
         )
 
-        self.direction.x = math.copysign(1, direction.x) if direction.x else 0
-        self.direction.y = -math.copysign(1, direction.y) if direction.y else 0
+        self.direction.x = copysign(1, direction.x) if direction.x else 0
+        self.direction.y = -copysign(1, direction.y) if direction.y else 0
 
         self.angle = target_angle - 180
 
 
-@dataclasses.dataclass
+@dataclass
 class EnemyFactory:
     speed = 500
-    layer: int = settings.Layer.ENTITIES.value
+    layer: int = Layer.ENTITIES.value
 
-    def create(self, pos: pygame.Vector2) -> Enemy:
-        return Enemy(
-            self.layer,
-            pos,
-            SpriteAnimationFactory().load_from_sheet_file(
-                settings.ASSETS_DIR / "enemy.png",
-                1,
-                1,
-            ),
-            (200, 200),
-            pygame.Vector2((self.speed, self.speed)),
-        )
+    def create(self, pos: Vector2) -> Enemy:
+        sheet_file_path: Path = ASSETS_DIR / "enemy.png"
+        animation: Animation = AnimationFactory().load_from_sheet(sheet_file_path, 1, 1)
+        speed = Vector2((self.speed, self.speed))
+        return Enemy(self.layer, pos, animation, (200, 200), speed)

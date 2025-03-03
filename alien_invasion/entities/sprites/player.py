@@ -1,15 +1,19 @@
-import dataclasses
-import math
+from dataclasses import dataclass
+from math import atan2, degrees
 from threading import Timer
+from typing import TYPE_CHECKING
 
 import inject
-import pygame
+from pygame import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w, key, mouse
+from pygame.math import Vector2
 
-from alien_invasion import settings
-from alien_invasion.entities.sprites import Sprite, SpriteAnimationFactory
+from alien_invasion.entities.sprites import Animation, AnimationFactory, Sprite, SpritesManager
 from alien_invasion.entities.sprites.bullet import BulletFactory
+from alien_invasion.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH, Layer
 from alien_invasion.utils.game_state import GameState
-from alien_invasion.utils.sprite_manager import SpritesManager
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Player(Sprite):
@@ -17,32 +21,30 @@ class Player(Sprite):
         self.can_shoot = True
 
     def input(self, dt: float) -> None:
-        keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.direction.y = -1
-        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.direction.y = 1
-        else:
-            self.direction.y = 0
+        self.direction = Vector2(0, 0)
 
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.direction.x = 1
-        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.direction.x = -1
-        else:
-            self.direction.x = 0
+        keys: key.ScancodeWrapper = key.get_pressed()
+        if keys[K_UP] or keys[K_w]:
+            self.direction.y -= 1
+        if keys[K_DOWN] or keys[K_s]:
+            self.direction.y += 1
 
-        if pygame.mouse.get_pressed()[0] and self.can_shoot:
+        if keys[K_RIGHT] or keys[K_d]:
+            self.direction.x += 1
+        if keys[K_LEFT] or keys[K_a]:
+            self.direction.x -= 1
+
+        if mouse.get_pressed()[0] and self.can_shoot:
             self.can_shoot = False
             Timer(0.7, lambda: setattr(self, "can_shoot", True)).start()
             self.fire()
 
-        mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
+        mouse_pos = Vector2(mouse.get_pos())
 
-        delta_x: float = mouse_pos.x - settings.SCREEN_WIDTH / 2
-        delta_y: float = -(mouse_pos.y - settings.SCREEN_HEIGHT / 2)
+        delta_x: float = mouse_pos.x - SCREEN_WIDTH / 2
+        delta_y: float = -(mouse_pos.y - SCREEN_HEIGHT / 2)
 
-        target_angle: float = math.degrees(math.atan2(delta_y, delta_x))
+        target_angle: float = degrees(atan2(delta_y, delta_x))
         diff: float = (target_angle - self.angle) % 360 - 180
         self.angle += diff * 8 * dt
 
@@ -50,26 +52,24 @@ class Player(Sprite):
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
         sprite_manager.add(BulletFactory().create(self.pos, self.angle % 360))
 
+    def on_collision(self, sprite: Sprite) -> None:
+        sprite_manager: SpritesManager = inject.instance(SpritesManager)
+
+        sprite_manager.remove(self)
+
     def update(self, dt: float) -> None:
         super().update(dt)
         game_state: GameState = inject.instance(GameState)
         game_state.player_position = self.pos
 
 
-@dataclasses.dataclass
+@dataclass
 class PlayerFactory:
     speed: int = 300
-    layer: int = settings.Layer.ENTITIES.value
+    layer: int = Layer.ENTITIES.value
 
-    def create(self, pos: pygame.Vector2) -> Player:
-        return Player(
-            self.layer,
-            pos,
-            SpriteAnimationFactory().load_from_sheet_file(
-                settings.ASSETS_DIR / "ship.png",
-                1,
-                1,
-            ),
-            (200, 200),
-            pygame.Vector2(self.speed, self.speed),
-        )
+    def create(self, pos: Vector2) -> Player:
+        sheet_file_path: Path = ASSETS_DIR / "ship.png"
+        animation: Animation = AnimationFactory().load_from_sheet(sheet_file_path, 1, 1)
+        speed = Vector2(self.speed, self.speed)
+        return Player(self.layer, pos, animation, (200, 200), speed)

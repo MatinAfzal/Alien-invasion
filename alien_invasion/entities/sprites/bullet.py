@@ -1,14 +1,14 @@
 import dataclasses
-import math
+from math import copysign, cos, radians, sin
+from typing import TYPE_CHECKING
 
-import pygame
+from pygame import Vector2
 
-from alien_invasion import settings
-from alien_invasion.entities.sprites import (
-    Sprite,
-    SpriteAnimation,
-    SpriteAnimationFactory,
-)
+from alien_invasion.entities.sprites import Animation, AnimationFactory, Sprite
+from alien_invasion.settings import ASSETS_DIR, Layer
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Bullet(Sprite): ...
@@ -17,35 +17,16 @@ class Bullet(Sprite): ...
 @dataclasses.dataclass
 class BulletFactory:
     speed: int = 1000
-    layer: int = settings.Layer.ENTITIES.value
+    layer: int = Layer.ENTITIES.value
 
     def __post_init__(self) -> None:
-        self.animation: SpriteAnimation = (
-            SpriteAnimationFactory().load_from_sheet_file(
-                settings.ASSETS_DIR / "bullet-sheet.png",
-                4,
-                1,
-            )
-        )
+        sheet_file_path: Path = ASSETS_DIR / "bullet-sheet.png"
+        self.animation: Animation = AnimationFactory().load_from_sheet(sheet_file_path, 4, 1)
 
-    def create(self, pos: pygame.Vector2, angle: float) -> Bullet:
+    def create(self, pos: Vector2, angle: float) -> Bullet:
         angle -= 180
-        direction: pygame.Vector2 = pygame.Vector2(
-            math.cos(math.radians(angle)),
-            math.sin(math.radians(angle)),
-        )
-        speed = pygame.Vector2(
-            abs(direction.x * self.speed),
-            abs(direction.y * self.speed),
-        )
-        direction.x = math.copysign(1, direction.x) if direction.x != 0 else 0
-        direction.y = -math.copysign(1, direction.y) if direction.y != 0 else 0
-        return Bullet(
-            self.layer,
-            pos,
-            self.animation,
-            (64, 64),
-            speed,
-            angle + 180,
-            direction,
-        )
+        direction: Vector2 = Vector2(cos(radians(angle)), sin(radians(angle)))
+        speed = Vector2(abs(direction.x * self.speed), abs(direction.y * self.speed))
+        direction.x = copysign(1, direction.x) if direction.x != 0 else 0
+        direction.y = -copysign(1, direction.y) if direction.y != 0 else 0
+        return Bullet(self.layer, pos, self.animation, (64, 64), speed, angle + 180, direction)

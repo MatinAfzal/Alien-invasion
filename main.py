@@ -1,8 +1,8 @@
 import inject
 
+from alien_invasion.entities.sprites import SpritesManager
 from alien_invasion.game import Game
 from alien_invasion.utils.game_state import GameState
-from alien_invasion.utils.sprite_manager import SpritesManager
 
 sm = SpritesManager()
 state = GameState()
