@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from secrets import randbelow
 from typing import TYPE_CHECKING
 
 import inject
@@ -9,7 +10,7 @@ from alien_invasion.entities.sprites import SpritesManager
 from alien_invasion.entities.sprites.enemy import EnemyFactory
 from alien_invasion.entities.sprites.player import PlayerFactory
 from alien_invasion.scenes import Scene
-from alien_invasion.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH
+from alien_invasion.settings import ASSETS_DIR, ENEMY_SPAWN_CHANCE, SCREEN_HEIGHT, SCREEN_WIDTH
 from alien_invasion.utils.game_state import GameState
 
 if TYPE_CHECKING:
@@ -45,13 +46,11 @@ class SpaceBG:
 
 class GameScene(Scene):
     def __init__(self) -> None:
-        super().__init__(
-            PlayerFactory().create(Vector2(640, 360)),
-            SpaceBG(),
-        )
+        super().__init__(PlayerFactory.create(Vector2(640, 360)), SpaceBG())
 
-    def __post_init__(self) -> None:
-        super().__post_init__()
+    def run(self, dt: float) -> None:
+        super().run(dt)
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
 
-        sprite_manager.add(EnemyFactory().create(Vector2(200, 200)))
+        if randbelow(100) < (ENEMY_SPAWN_CHANCE * 100):
+            sprite_manager.add(EnemyFactory.get_enemy())

@@ -4,12 +4,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import inject
-from pygame import image, mask, transform
+from pygame import mask, transform
 from pygame.math import Vector2
 from pygame.surface import Surface
 
 from alien_invasion.settings import SCREEN_HEIGHT, SCREEN_WIDTH
-from alien_invasion.utils import load_surfaces_from_sheet
+from alien_invasion.utils import load_surfaces_from_folder, load_surfaces_from_sheet
 from alien_invasion.utils.game_state import GameState
 
 if TYPE_CHECKING:
@@ -20,18 +20,17 @@ if TYPE_CHECKING:
 @dataclass
 class Animation:
     sprites: list[Surface] = field(default_factory=list)
-    fps: int = 1
+    fps: int = 8
     loops: int | None = None
 
 
 @dataclass
 class AnimationFactory:
-    fps: int = 4
+    fps: int = 8
     loops: int = -1
 
     def load_from_folder(self, path: Path) -> Animation:
-        surfaces: list[Surface] = [image.load(Path.resolve(file)).convert_alpha() for file in path.iterdir()]
-        return Animation(surfaces, self.fps, self.loops)
+        return Animation(load_surfaces_from_folder(path), self.fps, self.loops)
 
     def load_from_sheet(self, path: Path, cols: int, rows: int) -> Animation:
         return Animation(load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops)
@@ -55,6 +54,7 @@ class Sprite:
         self.speed: Vector2 = self.init_speed
         self.rect: Rect = self.image.get_rect(center=self.init_pos)
         self.pos: Vector2 = deepcopy(self.init_pos)
+        self.lock_position = False
 
         self.setup()
 
@@ -69,6 +69,9 @@ class Sprite:
     def input(self, dt: float) -> None: ...
 
     def move(self, dt: float) -> None:
+        if self.lock_position:
+            return
+
         if self.direction.magnitude():
             self.direction: Vector2 = self.direction.normalize()
         self.pos.x += self.direction.x * self.speed.x * dt
@@ -130,22 +133,19 @@ class SpritesManager:
                 self.sprites.remove(sprite)
 
     def update(self, dt: float) -> None:
-        game_state: GameState = inject.instance(GameState)
+        player_pos: Vector2 = inject.instance(GameState).player_pos
+        offset = 400
 
-        offset = 200
+        min_x: float = player_pos.x - SCREEN_WIDTH / 2 - offset
+        max_x: float = player_pos.x + SCREEN_WIDTH + offset
+        min_y: float = player_pos.y - SCREEN_HEIGHT / 2 - offset
+        max_y: float = player_pos.y + SCREEN_HEIGHT + offset
 
-        for idx, sprite in enumerate(self.sprites):
-            if not (
-                game_state.player_position.x - SCREEN_WIDTH / 2 - offset
-                < sprite.pos.x
-                < game_state.player_position.x + SCREEN_WIDTH + offset
-            ) or not (
-                game_state.player_position.y - SCREEN_HEIGHT / 2 - offset
-                < sprite.pos.y
-                < game_state.player_position.y + SCREEN_HEIGHT + offset
-            ):
-                del self.sprites[idx]
+        self.sprites = [
+            sprite for sprite in self.sprites if min_x < sprite.pos.x < max_x and min_y < sprite.pos.y < max_y
+        ]
 
+        for sprite in self.sprites:
             sprite.update(dt)
 
     def __sort_sprites(self) -> None:

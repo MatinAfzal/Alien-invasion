@@ -21,3 +21,7 @@ def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[Surface]:
             surfaces.append(frame_surface)
 
     return surfaces
+
+
+def load_surfaces_from_folder(path: Path) -> list[Surface]:
+    return [image.load(Path.resolve(file)).convert_alpha() for file in path.iterdir()]

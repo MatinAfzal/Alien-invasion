@@ -9,6 +9,8 @@ FPS: int = 120
 SCREEN_WIDTH: int = 1200
 SCREEN_HEIGHT: int = 800
 
+ENEMY_SPAWN_CHANCE = 0.002
+
 
 class Layer(Enum):
     GROUND = 1
