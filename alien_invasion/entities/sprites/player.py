@@ -6,13 +6,9 @@ import inject
 from pygame import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w, key, mouse
 from pygame.math import Vector2
 
-from alien_invasion.entities.sprites import (
-    AnimationFactory,
-    Sprite,
-    SpritesManager,
-)
+from alien_invasion.entities.sprites import Sprite, SpritesManager
 from alien_invasion.entities.sprites.bullet import BulletBuilder
-from alien_invasion.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH
+from alien_invasion.settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from alien_invasion.utils.game_state import GameState
 
 
@@ -55,19 +51,3 @@ class Player(Sprite):
         super().update(dt)
         game_state: GameState = inject.instance(GameState)
         game_state.player_pos = self.pos
-
-
-class PlayerFactory:
-    @staticmethod
-    def create(pos: Vector2) -> Player:
-        return Player(
-            animation=AnimationFactory().load_from_sheet(
-                ASSETS_DIR / "ship.png",
-                1,
-                1,
-            ),
-            init_pos=pos,
-            size=(160, 160),
-            speed=300,
-            angle=0,
-        )

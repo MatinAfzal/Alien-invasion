@@ -1,13 +1,8 @@
 from typing import Self
 
-import inject
 from pygame import Vector2
 
-from alien_invasion.entities.sprites import (
-    AnimationFactory,
-    Sprite,
-    SpritesManager,
-)
+from alien_invasion.entities.sprites import AnimationFactory, Sprite
 from alien_invasion.settings import ASSETS_DIR
 
 
@@ -17,12 +12,10 @@ class Bullet(Sprite):
         self.whitelist: list[type] = []
 
     def on_collision(self, sprite: Sprite) -> None:
-        sprite_manager: SpritesManager = inject.instance(SpritesManager)
-
         if isinstance(sprite, tuple(self.whitelist)):
             return
 
-        sprite_manager.remove(self)
+        self.kill()
 
 
 class BulletBuilder:

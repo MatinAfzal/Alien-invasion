@@ -6,11 +6,16 @@ import inject
 from pygame import Rect, display, image, transform
 from pygame.math import Vector2
 
-from alien_invasion.entities.sprites import SpritesManager
+from alien_invasion.entities.sprites import SpritesManager, AnimationFactory
 from alien_invasion.entities.sprites.enemy import EnemyFactory
-from alien_invasion.entities.sprites.player import PlayerFactory
+from alien_invasion.entities.sprites.player import Player
 from alien_invasion.scenes import Scene
-from alien_invasion.settings import ASSETS_DIR, ENEMY_SPAWN_CHANCE, SCREEN_HEIGHT, SCREEN_WIDTH
+from alien_invasion.settings import (
+    ASSETS_DIR,
+    ENEMY_SPAWN_CHANCE,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+)
 from alien_invasion.utils.game_state import GameState
 
 if TYPE_CHECKING:
@@ -23,7 +28,9 @@ if TYPE_CHECKING:
 class SpaceBG:
     def __post_init__(self) -> None:
         image_path: Path = ASSETS_DIR / "bg.png"
-        self.image: Surface = transform.scale(image.load(image_path), (640, 640)).convert()
+        self.image: Surface = transform.scale(
+            image.load(image_path), (640, 640)
+        ).convert()
         self.rect: Rect = self.image.get_rect(topleft=(0, 0))
 
     def draw(self) -> None:
@@ -40,13 +47,29 @@ class SpaceBG:
             for y in range(-img_height, SCREEN_HEIGHT + img_height, img_height):
                 display_surf.blit(
                     self.image,
-                    (x - camera_offset.x % img_width, y - camera_offset.y % img_height),
+                    (
+                        x - camera_offset.x % img_width,
+                        y - camera_offset.y % img_height,
+                    ),
                 )
 
 
 class GameScene(Scene):
     def __init__(self) -> None:
-        super().__init__(PlayerFactory.create(Vector2(640, 360)), SpaceBG())
+        super().__init__(
+            Player(
+                animation=AnimationFactory().load_from_sheet(
+                    ASSETS_DIR / "ship.png",
+                    1,
+                    1,
+                ),
+                init_pos=Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2),
+                size=(160, 160),
+                speed=300,
+                angle=0,
+            ),
+            SpaceBG(),
+        )
 
     def run(self, dt: float) -> None:
         super().run(dt)

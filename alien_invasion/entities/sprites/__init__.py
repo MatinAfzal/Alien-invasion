@@ -1,4 +1,5 @@
 from copy import deepcopy
+from enum import Enum
 from dataclasses import dataclass, field
 from math import copysign, cos, radians, sin
 from pathlib import Path
@@ -38,14 +39,23 @@ class AnimationFactory:
 
     def load_from_sheet(self, path: Path, cols: int, rows: int) -> Animation:
         return Animation(
-            load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops
+            load_surfaces_from_sheet(path, cols, rows),
+            self.fps,
+            self.loops,
         )
+
+
+class SpriteState(Enum):
+    ALIVE = 1
+    DEAD = 2
 
 
 @dataclass(kw_only=True)
 class Sprite:
-    animation: Animation
     size: tuple[int, int]
+    animation: Animation
+
+    on_die_animation: Animation | None = None
     z: int = Layer.ENTITIES.value
     init_pos: Vector2 = field(default_factory=Vector2)
     speed: int = 0
@@ -53,6 +63,8 @@ class Sprite:
     direction: Vector2 = field(default_factory=Vector2)
     apply_angle_to_movement: bool = False
 
+    state: SpriteState = field(default=SpriteState.ALIVE, init=False)
+    dead: bool = field(default=False, init=False)
     frame_idx: float = field(default=0, init=False)
     lock_position: bool = field(default=False, init=False)
 
@@ -89,10 +101,28 @@ class Sprite:
 
     def change_animation(self, animation: Animation) -> None:
         self.__animation = animation
+        self.frame_idx = 0
+
+    def kill(self) -> None:
+        if self.state == SpriteState.DEAD:
+            return
+
+        self.state = SpriteState.DEAD
+        self.lock_position = True
+        if self.on_die_animation:
+            self.change_animation(self.on_die_animation)
 
     def animate(self, dt: float) -> None:
         if not self.__animation or not self.__animation.sprites:
             return
+
+        if self.state == SpriteState.DEAD:
+            if (
+                not self.on_die_animation
+                or self.frame_idx >= len(self.__animation.sprites) - 1
+            ):
+                self.dead = True
+                return
 
         self.frame_idx = (self.frame_idx + self.__animation.fps * dt) % len(
             self.__animation.sprites
@@ -168,7 +198,9 @@ class SpritesManager:
         self.sprites = [
             sprite
             for sprite in self.sprites
-            if min_x < sprite.pos.x < max_x and min_y < sprite.pos.y < max_y
+            if min_x < sprite.pos.x < max_x
+            and min_y < sprite.pos.y < max_y
+            and not sprite.dead
         ]
 
         for sprite in self.sprites:

@@ -8,7 +8,6 @@ import inject
 from pygame.math import Vector2
 
 from alien_invasion.entities.sprites import (
-    Animation,
     AnimationFactory,
     Sprite,
     SpritesManager,
@@ -45,15 +44,7 @@ class Enemy(Sprite):
             sprite,
             Player | type(self),
         ):
-            sprite_manager: SpritesManager = inject.instance(SpritesManager)
-            animation: Animation = AnimationFactory(fps=24).load_from_sheet(
-                ASSETS_DIR / "enemy_destruction.png",
-                9,
-                1,
-            )
-            self.change_animation(animation)
-            self.lock_position = True
-            Timer(0.32, lambda: sprite_manager.remove(self)).start()
+            self.kill()
 
     def fire(self) -> None:
         if self.lock_position:
@@ -76,6 +67,11 @@ class EnemyBuilder:
             animation=AnimationFactory().load_from_sheet(
                 ASSETS_DIR / "enemy.png",
                 1,
+                1,
+            ),
+            on_die_animation=AnimationFactory(fps=24).load_from_sheet(
+                ASSETS_DIR / "enemy_destruction.png",
+                9,
                 1,
             ),
             size=(200, 200),
