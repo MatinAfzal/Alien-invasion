@@ -1,19 +1,22 @@
 from copy import deepcopy
-from math import atan2, copysign, cos, degrees, radians, sin
+from math import atan2, degrees
 from secrets import choice, randbelow
 from threading import Timer
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 import inject
 from pygame.math import Vector2
 
-from alien_invasion.entities.sprites import Animation, AnimationFactory, Sprite, SpritesManager
-from alien_invasion.entities.sprites.bullet import BulletBuilder
-from alien_invasion.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH, Layer
+from alien_invasion.entities.sprites import (
+    Animation,
+    AnimationFactory,
+    Sprite,
+    SpritesManager,
+)
+from alien_invasion.entities.sprites.bullet import Bullet, BulletBuilder
+from alien_invasion.entities.sprites.player import Player
+from alien_invasion.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH
 from alien_invasion.utils.game_state import GameState
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class Enemy(Sprite):
@@ -23,6 +26,8 @@ class Enemy(Sprite):
 
     def update(self, dt: float) -> None:
         super().update(dt)
+        if self.lock_position:
+            return
 
         game_state: GameState = inject.instance(GameState)
 
@@ -31,25 +36,24 @@ class Enemy(Sprite):
 
         target_angle: float = degrees(atan2(delta_y, delta_x))
 
-        direction = Vector2(cos(radians(target_angle)), sin(radians(target_angle)))
-
-        self.speed = Vector2(abs(direction.x * self.init_speed.x), abs(direction.y * self.init_speed.y))
-
-        self.direction.x = copysign(1, direction.x) if direction.x else 0
-        self.direction.y = -copysign(1, direction.y) if direction.y else 0
-
-        if not self.lock_position:
-            self.angle = target_angle - 180
+        self.angle = target_angle - 180
 
     def on_collision(self, sprite: Sprite) -> None:
-        sprite_manager: SpritesManager = inject.instance(SpritesManager)
-
-        sheet_file_path: Path = ASSETS_DIR / "enemy_destruction.png"
-        animation: Animation = AnimationFactory(fps=24).load_from_sheet(sheet_file_path, 9, 1)
-
-        self.lock_position = True
-        self.animation = animation
-        Timer(0.32, lambda: sprite_manager.remove(self)).start()
+        if (
+            isinstance(sprite, Bullet) and type(self) not in sprite.whitelist
+        ) or isinstance(
+            sprite,
+            Player | type(self),
+        ):
+            sprite_manager: SpritesManager = inject.instance(SpritesManager)
+            animation: Animation = AnimationFactory(fps=24).load_from_sheet(
+                ASSETS_DIR / "enemy_destruction.png",
+                9,
+                1,
+            )
+            self.change_animation(animation)
+            self.lock_position = True
+            Timer(0.32, lambda: sprite_manager.remove(self)).start()
 
     def fire(self) -> None:
         if self.lock_position:
@@ -58,24 +62,33 @@ class Enemy(Sprite):
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
 
         sprite_manager.add(
-            BulletBuilder().set_whitelist([Enemy]).set_pos(deepcopy(self.pos)).set_angle(self.angle).build()
+            BulletBuilder()
+            .set_whitelist([Enemy])
+            .set_pos(deepcopy(self.pos))
+            .set_angle(self.angle)
+            .build(),
         )
 
 
 class EnemyBuilder:
     def __init__(self) -> None:
-        layer = Layer.ENTITIES.value
-        sheet_file_path: Path = ASSETS_DIR / "enemy.png"
-        animation: Animation = AnimationFactory().load_from_sheet(sheet_file_path, 1, 1)
-        speed = Vector2(600, 600)
-        self.enemy = Enemy(layer, Vector2(0, 0), animation, (200, 200), speed)
+        self.enemy = Enemy(
+            animation=AnimationFactory().load_from_sheet(
+                ASSETS_DIR / "enemy.png",
+                1,
+                1,
+            ),
+            size=(200, 200),
+            speed=600,
+            apply_angle_to_movement=True,
+        )
 
     def set_pos(self, pos: Vector2) -> Self:
         self.enemy.pos = pos
         return self
 
     def set_speed(self, speed: int) -> Self:
-        self.enemy.speed = Vector2(speed, speed)
+        self.enemy.speed = speed
         return self
 
     def build(self) -> Enemy:
@@ -93,7 +106,7 @@ class EnemyFactory:
         y2: float = player_pos.y - SCREEN_HEIGHT // 2 - 400
 
         edges: list[str] = ["top", "bottom", "left", "right"]
-        edge: str = choice(edges)  # انتخاب یک ضلع به‌صورت امن
+        edge: str = choice(edges)
 
         if edge == "top":
             x: float = x1 + (x2 - x1) * randbelow(10**6) / 10**6

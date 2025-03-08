@@ -1,14 +1,15 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
+from math import copysign, cos, radians, sin
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import inject
 from pygame import mask, transform
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from alien_invasion.settings import SCREEN_HEIGHT, SCREEN_WIDTH
+from alien_invasion.settings import SCREEN_HEIGHT, SCREEN_WIDTH, Layer
 from alien_invasion.utils import load_surfaces_from_folder, load_surfaces_from_sheet
 from alien_invasion.utils.game_state import GameState
 
@@ -36,31 +37,33 @@ class AnimationFactory:
         return Animation(load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Sprite:
-    z: int
-    init_pos: Vector2
-    init_animation: Animation
+    animation: Animation
     size: tuple[int, int]
-    init_speed: Vector2
+    z: int = Layer.ENTITIES.value
+    init_pos: Vector2 = field(default_factory=Vector2)
+    speed: int = 0
     angle: float = 0
     direction: Vector2 = field(default_factory=Vector2)
+    apply_angle_to_movement: bool = False
 
     frame_idx: float = field(default=0, init=False)
+    lock_position: bool = field(default=False, init=False)
 
     def __post_init__(self) -> None:
-        super().__init__()
-        self.animation: Animation = deepcopy(self.init_animation)
-        self.speed: Vector2 = self.init_speed
+        self.__animation: Animation = deepcopy(self.animation)
+        self.__speed: Vector2 = Vector2(self.speed, self.speed)
         self.rect: Rect = self.image.get_rect(center=self.init_pos)
         self.pos: Vector2 = deepcopy(self.init_pos)
-        self.lock_position = False
+
+        self.game_state: GameState = inject.instance(GameState)
 
         self.setup()
 
     @property
     def image(self) -> Surface:
-        image: Surface = self.animation.sprites[int(self.frame_idx)]
+        image: Surface = self.__animation.sprites[int(self.frame_idx)]
         image = transform.scale(image, self.size)
         return transform.rotate(image, self.angle)
 
@@ -74,54 +77,47 @@ class Sprite:
 
         if self.direction.magnitude():
             self.direction: Vector2 = self.direction.normalize()
-        self.pos.x += self.direction.x * self.speed.x * dt
-        self.pos.y += self.direction.y * self.speed.y * dt
+        self.pos.x += self.direction.x * self.__speed.x * dt
+        self.pos.y += self.direction.y * self.__speed.y * dt
         self.rect.center = (int(self.pos.x), int(self.pos.y))
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def change_animation(self, animation: Animation) -> None:
-        self.animation = animation
+        self.__animation = animation
 
     def animate(self, dt: float) -> None:
-        if not self.animation:
+        if not self.__animation or not self.__animation.sprites:
             return
 
-        self.frame_idx = (self.frame_idx + self.animation.fps * dt) % len(self.animation.sprites)
+        self.frame_idx = (self.frame_idx + self.__animation.fps * dt) % len(
+            self.__animation.sprites
+        )
 
-    def check_collision(self) -> None:
-        sprite_manager: SpritesManager = inject.instance(SpritesManager)
-
-        try:
-            for sprite in sprite_manager.sprites:
-                if sprite is self:
-                    continue
-
-                mask1: Mask = mask.from_surface(self.image)
-                mask2: Mask = mask.from_surface(sprite.image)
-
-                offset: tuple[int, int] = (sprite.rect.x - self.rect.x, sprite.rect.y - self.rect.y)
-
-                if mask1.overlap(mask2, offset) is not None:
-                    self.on_collision(sprite)
-        except NotImplementedError:
-            return
-
-    def on_collision(self, sprite: "Sprite") -> None:
+    def on_collision(self, sprite: Self) -> None:
         raise NotImplementedError
 
+    def __apply_angle_to_movement(self) -> None:
+        angle: float = self.angle - 180
+        direction: Vector2 = Vector2(cos(radians(angle)), sin(radians(angle)))
+        speed = Vector2(abs(direction.x * self.speed), abs(direction.y * self.speed))
+        direction.x = copysign(1, direction.x) if direction.x != 0 else 0
+        direction.y = -copysign(1, direction.y) if direction.y != 0 else 0
+
+        self.__speed = speed
+        self.direction = direction
+
     def update(self, dt: float) -> None:
-        self.check_collision()
         self.input(dt)
         self.move(dt)
         self.animate(dt)
 
+        if self.apply_angle_to_movement:
+            self.__apply_angle_to_movement()
+
 
 @dataclass
 class SpritesManager:
-    sprites: list[Sprite] = field(default_factory=list)
-
-    def __post_init__(self) -> None:
-        self.__sort_sprites()
+    sprites: list[Sprite] = field(default_factory=list, init=False)
 
     def add(self, sprite: Sprite) -> None:
         self.sprites.append(sprite)
@@ -131,6 +127,26 @@ class SpritesManager:
         for s in self.sprites:
             if s is sprite:
                 self.sprites.remove(sprite)
+
+    def check_collision(self) -> None:
+        for first_sprite in self.sprites:
+            for second_sprite in self.sprites:
+                if first_sprite is second_sprite:
+                    continue
+
+                mask1: Mask = mask.from_surface(first_sprite.image)
+                mask2: Mask = mask.from_surface(second_sprite.image)
+
+                offset: tuple[int, int] = (
+                    second_sprite.rect.x - first_sprite.rect.x,
+                    second_sprite.rect.y - first_sprite.rect.y,
+                )
+
+                if mask1.overlap(mask2, offset) is not None:
+                    try:
+                        first_sprite.on_collision(second_sprite)
+                    except NotImplementedError:
+                        continue
 
     def update(self, dt: float) -> None:
         player_pos: Vector2 = inject.instance(GameState).player_pos
@@ -142,11 +158,15 @@ class SpritesManager:
         max_y: float = player_pos.y + SCREEN_HEIGHT + offset
 
         self.sprites = [
-            sprite for sprite in self.sprites if min_x < sprite.pos.x < max_x and min_y < sprite.pos.y < max_y
+            sprite
+            for sprite in self.sprites
+            if min_x < sprite.pos.x < max_x and min_y < sprite.pos.y < max_y
         ]
 
         for sprite in self.sprites:
             sprite.update(dt)
+
+        self.check_collision()
 
     def __sort_sprites(self) -> None:
         self.sprites = sorted(self.sprites, key=lambda x: (x.z, x.rect.center))

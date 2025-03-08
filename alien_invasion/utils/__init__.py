@@ -16,7 +16,12 @@ def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[Surface]:
 
     for row in range(rows):
         for col in range(cols):
-            rect = Rect(col * frame_width, row * frame_height, frame_width, frame_height)
+            rect = Rect(
+                col * frame_width,
+                row * frame_height,
+                frame_width,
+                frame_height,
+            )
             frame_surface: Surface = deepcopy(sheet.subsurface(rect))
             surfaces.append(frame_surface)
 
@@ -24,4 +29,7 @@ def load_surfaces_from_sheet(path: Path, cols: int, rows: int) -> list[Surface]:
 
 
 def load_surfaces_from_folder(path: Path) -> list[Surface]:
-    return [image.load(Path.resolve(file)).convert_alpha() for file in path.iterdir()]
+    return [
+        image.load(Path.resolve(file)).convert_alpha()
+        for file in path.iterdir()
+    ]

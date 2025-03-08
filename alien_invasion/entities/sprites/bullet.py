@@ -1,15 +1,15 @@
-from math import copysign, cos, radians, sin
 from threading import Timer
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 import inject
 from pygame import Vector2
 
-from alien_invasion.entities.sprites import Animation, AnimationFactory, Sprite, SpritesManager
-from alien_invasion.settings import ASSETS_DIR, Layer
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from alien_invasion.entities.sprites import (
+    AnimationFactory,
+    Sprite,
+    SpritesManager,
+)
+from alien_invasion.settings import ASSETS_DIR
 
 
 class Bullet(Sprite):
@@ -29,17 +29,16 @@ class Bullet(Sprite):
 
 class BulletBuilder:
     def __init__(self) -> None:
-        self.init_speed = 1400
-        layer: int = Layer.ENTITIES.value
-        pos = Vector2(0, 0)
-        sheet_file_path: Path = ASSETS_DIR / "bullet_sheet.png"
-        animation: Animation = AnimationFactory().load_from_sheet(sheet_file_path, 4, 1)
-        angle = 0
-        direction: Vector2 = Vector2(cos(radians(angle)), sin(radians(angle)))
-        speed = Vector2(abs(direction.x * self.init_speed), abs(direction.y * self.init_speed))
-        direction.x = copysign(1, direction.x) if direction.x != 0 else 0
-        direction.y = -copysign(1, direction.y) if direction.y != 0 else 0
-        self.bullet = Bullet(layer, pos, animation, (64, 64), speed, angle + 180, direction)
+        self.bullet = Bullet(
+            animation=AnimationFactory().load_from_sheet(
+                ASSETS_DIR / "bullet_sheet.png",
+                4,
+                1,
+            ),
+            size=(32, 32),
+            speed=1400,
+            apply_angle_to_movement=True,
+        )
 
     def set_whitelist(self, sprite_type: list[type]) -> Self:
         self.bullet.whitelist = sprite_type
@@ -50,19 +49,11 @@ class BulletBuilder:
         return self
 
     def set_speed(self, speed: int) -> Self:
-        self.init_speed: int = speed
+        self.bullet.speed = speed
         return self
 
     def set_angle(self, angle: float) -> Self:
         self.bullet.angle = angle
-        angle -= 180
-        direction: Vector2 = Vector2(cos(radians(angle)), sin(radians(angle)))
-        speed = Vector2(abs(direction.x * self.init_speed), abs(direction.y * self.init_speed))
-        direction.x = copysign(1, direction.x) if direction.x != 0 else 0
-        direction.y = -copysign(1, direction.y) if direction.y != 0 else 0
-
-        self.bullet.speed = speed
-        self.bullet.direction = direction
 
         return self
 
