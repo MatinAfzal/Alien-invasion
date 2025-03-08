@@ -10,7 +10,10 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 
 from alien_invasion.settings import SCREEN_HEIGHT, SCREEN_WIDTH, Layer
-from alien_invasion.utils import load_surfaces_from_folder, load_surfaces_from_sheet
+from alien_invasion.utils import (
+    load_surfaces_from_folder,
+    load_surfaces_from_sheet,
+)
 from alien_invasion.utils.game_state import GameState
 
 if TYPE_CHECKING:
@@ -34,7 +37,9 @@ class AnimationFactory:
         return Animation(load_surfaces_from_folder(path), self.fps, self.loops)
 
     def load_from_sheet(self, path: Path, cols: int, rows: int) -> Animation:
-        return Animation(load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops)
+        return Animation(
+            load_surfaces_from_sheet(path, cols, rows), self.fps, self.loops
+        )
 
 
 @dataclass(kw_only=True)
@@ -93,13 +98,14 @@ class Sprite:
             self.__animation.sprites
         )
 
-    def on_collision(self, sprite: Self) -> None:
-        raise NotImplementedError
+    def on_collision(self, sprite: Self) -> None: ...
 
     def __apply_angle_to_movement(self) -> None:
         angle: float = self.angle - 180
         direction: Vector2 = Vector2(cos(radians(angle)), sin(radians(angle)))
-        speed = Vector2(abs(direction.x * self.speed), abs(direction.y * self.speed))
+        speed = Vector2(
+            abs(direction.x * self.speed), abs(direction.y * self.speed)
+        )
         direction.x = copysign(1, direction.x) if direction.x != 0 else 0
         direction.y = -copysign(1, direction.y) if direction.y != 0 else 0
 
@@ -129,6 +135,8 @@ class SpritesManager:
                 self.sprites.remove(sprite)
 
     def check_collision(self) -> None:
+        collisions: list[tuple[Sprite, Sprite]] = []
+
         for first_sprite in self.sprites:
             for second_sprite in self.sprites:
                 if first_sprite is second_sprite:
@@ -143,10 +151,10 @@ class SpritesManager:
                 )
 
                 if mask1.overlap(mask2, offset) is not None:
-                    try:
-                        first_sprite.on_collision(second_sprite)
-                    except NotImplementedError:
-                        continue
+                    collisions.append((first_sprite, second_sprite))
+
+        for first_sprite, second_sprite in collisions:
+            first_sprite.on_collision(second_sprite)
 
     def update(self, dt: float) -> None:
         player_pos: Vector2 = inject.instance(GameState).player_pos

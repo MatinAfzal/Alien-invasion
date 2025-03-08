@@ -1,4 +1,3 @@
-from threading import Timer
 from typing import Self
 
 import inject
@@ -20,11 +19,10 @@ class Bullet(Sprite):
     def on_collision(self, sprite: Sprite) -> None:
         sprite_manager: SpritesManager = inject.instance(SpritesManager)
 
-        for sprite_type in self.whitelist:
-            if isinstance(sprite, sprite_type):
-                return
+        if isinstance(sprite, tuple(self.whitelist)):
+            return
 
-        Timer(0.1, lambda: sprite_manager.remove(self)).start()
+        sprite_manager.remove(self)
 
 
 class BulletBuilder:
