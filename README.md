@@ -55,7 +55,7 @@ The foundation is set, but now it’s time to build something even better. If yo
 
 
 ## Features
-###Pygame Console
+### Pygame Console
 ![Pygame Console](./docs/pygame_console.gif)
 
 
