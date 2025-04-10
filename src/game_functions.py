@@ -107,21 +107,25 @@ def update_game_sprites(ai_settings, screen, stats, sb, ship, aliens, bullets, c
 
 def check_events(ai_settings, input, screen, stats, ship, bullets):
     """Respond to key presses and mouse events."""
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    ai_settings.console.update(events)
+    for event in events:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-    check_key_events(input, ship)
+    check_key_events(input, ship, ai_settings.console)
     check_mouse_events(ai_settings, input, screen, stats, ship, bullets)
 
 
-def check_key_events(input, ship):
+def check_key_events(input, ship, console):
     """Handle key down/up"""
 
     if input.is_key_pressed(pygame.K_q):
         pygame.quit()
         sys.exit()
+    elif input.is_key_pressed(pygame.K_F1):
+        console.toggle()
 
     ship.moving_right = True if input.is_key_down(pygame.K_RIGHT) or input.is_key_down(pygame.K_d) else False
     ship.moving_left = True if input.is_key_down(pygame.K_LEFT) or input.is_key_down(pygame.K_a) else False
@@ -178,6 +182,7 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
     screen.fill(ai_settings.bg_color)
     screen.blit(screen_bg, (ai_settings.bg_screen_x, ai_settings.bg_screen_y))
     screen.blit(screen_bg_2, (ai_settings.bg_screen_2_x, ai_settings.bg_screen_2_y))
+    ai_settings.console.show(screen)
 
     # Redraw all bullets behind ship and aliens.
     for bullet in bullets.sprites():
