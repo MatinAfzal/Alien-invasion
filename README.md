@@ -54,6 +54,10 @@ The foundation is set, but now it’s time to build something even better. If yo
 </table>
 
 
+## Features
+[Pygame Console](./docs/pygame_console.mkv)
+
+
 ## How to Contribute
 
 - To contribute to the Alien Invasion project, please make your pull requests to the [develop](https://github.com/MatinAfzal/Alien-invasion/tree/develop) branch with a clear and detailed description in English of the changes you've made. 
