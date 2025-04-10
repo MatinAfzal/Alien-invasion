@@ -1,3 +1,7 @@
+from src.pygame_console import Console
+import json, re
+
+
 class Settings:
     """A class to store all settings for Alien Invasion"""
 
@@ -63,6 +67,18 @@ class Settings:
         # lives settings.
         self.init_hearts = 5
         self.max_hearts = 5
+        
+        # integrate pygame console
+        self.console_config = self.get_console_config_json("src/console_configs/console_config06.json")
+        self.console = Console(self, self.screen_width, self.console_config)
+        
+    def get_console_config_json(self, config_file_path: str):
+        try:
+            with open(config_file_path, "r") as json_file:
+                json_data = json_file.read()
+                return json.loads(re.sub("[^:]//.*", "", json_data, flags=re.MULTILINE))  # Remove C-style comments before processing JSON
+        except FileNotFoundError:
+            raise
 
     def initialize_dynamic_settings(self):
         """Increase speed settings and alien point values."""
