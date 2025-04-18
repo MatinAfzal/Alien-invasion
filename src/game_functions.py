@@ -115,16 +115,16 @@ def update_game_sprites(
     update_shields(ship, shields, health)
 
 
-def check_events(ai_settings, input, screen, stats, ship, bullets):
+def check_events(ai_settings, input, screen, stats, ship, bullets, console):
     """Respond to key presses and mouse events."""
     events = pygame.event.get()
-    ai_settings.console.update(events)
+    console.update(events)
     for event in events:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-    check_key_events(input, ship, ai_settings.console)
+    check_key_events(input, ship, console)
     check_mouse_events(ai_settings, input, screen, stats, ship, bullets)
 
 
@@ -203,13 +203,14 @@ def update_screen(
     health,
     hearts,
     shields,
+    console,
 ):
     """Update image on the screen and flip to the new screen."""
     # Redraw the screen during each pass through the loop
     screen.fill(ai_settings.bg_color)
     screen.blit(screen_bg, (ai_settings.bg_screen_x, ai_settings.bg_screen_y))
     screen.blit(screen_bg_2, (ai_settings.bg_screen_2_x, ai_settings.bg_screen_2_y))
-    ai_settings.console.show(screen)
+    console.show(screen)
 
     # Redraw all bullets behind ship and aliens.
     for bullet in bullets.sprites():
