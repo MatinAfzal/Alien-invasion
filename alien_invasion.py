@@ -1,4 +1,4 @@
-import pygame
+import pygame, json, re
 from pygame.sprite import Group
 
 import src.game_functions as gf
@@ -10,6 +10,7 @@ from src.health import Health
 from src.input import Input
 from src.settings import ASSETS_DIR, SCREEN_HEIGHT, SCREEN_WIDTH, Settings
 from src.ship import Ship
+from src.pygame_console import Console
 
 
 class Game:
@@ -73,11 +74,23 @@ class Game:
         gf.load_animations(self.screen)
         gf.load_credits()
 
+        # Console
+        self.console_config = self.get_console_config_json("src/console_configs/console_config06.json")
+        self.console = Console(self, SCREEN_WIDTH, self.console_config)
+
+    def get_console_config_json(self, config_file_path: str):
+        try:
+            with open(config_file_path, "r") as json_file:
+                json_data = json_file.read()
+                return json.loads(re.sub("[^:]//.*", "", json_data, flags=re.MULTILINE))
+        except FileNotFoundError:
+            raise
+
     def run_game(self):
         # Start the main loop for the game.
         while True:
             self.input.update()
-            gf.check_events(self.ai_settings, self.input, self.screen, self.stats, self.ship, self.bullets)
+            gf.check_events(self.ai_settings, self.input, self.screen, self.stats, self.ship, self.bullets, self.console)
             if self.stats.game_active:
                 # Prevent mouse from going out of self.screen.
                 pygame.event.set_grab(True)
@@ -118,6 +131,7 @@ class Game:
                 self.health,
                 self.hearts,
                 self.shields,
+                self.console,
             )
 
             self.clock.tick(self.ai_settings.fps)
