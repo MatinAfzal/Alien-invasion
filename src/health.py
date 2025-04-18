@@ -9,14 +9,13 @@ from src.entities.items.shield import SHIELD_TIME
 
 from .game_stats import GameStats
 
-INIT_HEARTS: int = 5
-MAX_HEARTS: int = 5
-
 
 @dataclass
 class Health:
     """Handles ship health and shields."""
 
+    INIT_HEARTS: int = 5
+    MAX_HEARTS: int = 5
     screen: pygame.Surface = field(default_factory=pygame.display.get_surface, init=False)
     current_hearts: int = INIT_HEARTS
     freeze_flag: bool = False
@@ -24,15 +23,15 @@ class Health:
 
     def reset(self) -> None:
         """Reset health to initial value."""
-        self.current_hearts = INIT_HEARTS
+        self.current_hearts = self.INIT_HEARTS
 
     def full(self) -> None:
         """Set health to maximum."""
-        self.current_hearts = MAX_HEARTS
+        self.current_hearts = self.MAX_HEARTS
 
     def increase(self) -> None:
         """Increase health by one if not at max."""
-        if self.current_hearts < MAX_HEARTS:
+        if self.current_hearts < self.MAX_HEARTS:
             self.current_hearts += 1
 
     def decrease(self, stats: GameStats) -> None:
@@ -62,6 +61,6 @@ class Health:
         )
 
         rect: pygame.Rect = self.screen.get_rect(topleft=(20, 20))
-        for i in range(MAX_HEARTS):
+        for i in range(self.MAX_HEARTS):
             self.screen.blit(full_heart if i < self.current_hearts else empty_heart, rect)
             rect.x += 25
