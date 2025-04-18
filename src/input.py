@@ -5,7 +5,6 @@ class Input:
     """Handle Pygame input more easily, including key/mouse press, release and double-press."""
 
     def __init__(self):
-
         self.double_press_timeout = 30  # milliseconds
 
         # set current and previous states
@@ -19,17 +18,29 @@ class Input:
         self.previous_mouse_position = pygame.mouse.get_pos()
 
         # set long press durations
-        self.__key_press_durations = [0 for _ in range(len(self.current_key_states))]
-        self.__mouse_button_durations = [0 for _ in range(len(self.current_mouse_button_states))]
+        self.__key_press_durations = [
+            0 for _ in range(len(self.current_key_states))
+        ]
+        self.__mouse_button_durations = [
+            0 for _ in range(len(self.current_mouse_button_states))
+        ]
 
         # store info to determine button double-press
-        self.__key_time_since_last_pressed = [0 for _ in range(len(self.current_key_states))]
-        self.__mouse_time_since_last_pressed = [0 for _ in range(len(self.current_mouse_button_states))]
+        self.__key_time_since_last_pressed = [
+            0 for _ in range(len(self.current_key_states))
+        ]
+        self.__mouse_time_since_last_pressed = [
+            0 for _ in range(len(self.current_mouse_button_states))
+        ]
 
         # stores the press state of each button
         # 'none' -> 'single' -> 'double'
-        self.__key_press_states = ["none" for _ in range(len(self.current_key_states))]
-        self.__mouse_press_states = ["none" for _ in range(len(self.current_mouse_button_states))]
+        self.__key_press_states = [
+            "none" for _ in range(len(self.current_key_states))
+        ]
+        self.__mouse_press_states = [
+            "none" for _ in range(len(self.current_mouse_button_states))
+        ]
 
     def update(self):
         # update key press info
@@ -58,11 +69,16 @@ class Input:
             if self.__key_press_states[i] == "none" and self.is_key_pressed(i):
                 self.__key_press_states[i] = "single"
             # single -> double
-            elif self.__key_press_states[i] == "single" and self.is_key_pressed(i):
+            elif self.__key_press_states[i] == "single" and self.is_key_pressed(
+                i
+            ):
                 self.__key_press_states[i] = "double"
             # single -> none
-            elif (self.__key_press_states[i] == "single" and
-                  self.__key_time_since_last_pressed[i] > self.double_press_timeout):
+            elif (
+                self.__key_press_states[i] == "single"
+                and self.__key_time_since_last_pressed[i]
+                > self.double_press_timeout
+            ):
                 self.__key_press_states[i] = "none"
             # double -> none
             elif self.__key_press_states[i] == "double":
@@ -98,14 +114,21 @@ class Input:
         # 'none', 'single' and 'double'
         for i in range(len(self.__mouse_press_states)):
             # none -> single
-            if self.__mouse_press_states[i] == "none" and self.is_mouse_button_pressed(i):
+            if self.__mouse_press_states[
+                i
+            ] == "none" and self.is_mouse_button_pressed(i):
                 self.__mouse_press_states[i] = "single"
             # single -> double
-            elif self.__mouse_press_states[i] == "single" and self.is_mouse_button_pressed(i):
+            elif self.__mouse_press_states[
+                i
+            ] == "single" and self.is_mouse_button_pressed(i):
                 self.__mouse_press_states[i] = "double"
             # single -> none
-            elif (self.__mouse_press_states[i] == "single" and
-                  self.__mouse_time_since_last_pressed[i] > self.double_press_timeout):
+            elif (
+                self.__mouse_press_states[i] == "single"
+                and self.__mouse_time_since_last_pressed[i]
+                > self.double_press_timeout
+            ):
                 self.__mouse_press_states[i] = "none"
             # double -> none
             elif self.__mouse_press_states[i] == "double":
@@ -135,7 +158,10 @@ class Input:
 
         if self.current_key_states is None or self.previous_key_states is None:
             return False
-        return self.current_key_states[key_code] and not self.previous_key_states[key_code]
+        return (
+            self.current_key_states[key_code]
+            and not self.previous_key_states[key_code]
+        )
 
     def is_key_double_pressed(self, key_code):
         """
@@ -155,7 +181,10 @@ class Input:
 
         if self.current_key_states is None or self.previous_key_states is None:
             return False
-        return not self.current_key_states[key_code] and self.previous_key_states[key_code]
+        return (
+            not self.current_key_states[key_code]
+            and self.previous_key_states[key_code]
+        )
 
     def get_key_down_duration(self, key_code):
         """
@@ -184,7 +213,10 @@ class Input:
         :param int mouse_button: The mouse button to check.
         """
 
-        if self.current_mouse_button_states is None or self.previous_mouse_button_states is None:
+        if (
+            self.current_mouse_button_states is None
+            or self.previous_mouse_button_states is None
+        ):
             return False
         return self.current_mouse_button_states[mouse_button]
 
@@ -195,9 +227,15 @@ class Input:
         :param int mouse_button: The mouse button to check.
         """
 
-        if self.current_mouse_button_states is None or self.previous_mouse_button_states is None:
+        if (
+            self.current_mouse_button_states is None
+            or self.previous_mouse_button_states is None
+        ):
             return False
-        return self.current_mouse_button_states[mouse_button] and not self.previous_mouse_button_states[mouse_button]
+        return (
+            self.current_mouse_button_states[mouse_button]
+            and not self.previous_mouse_button_states[mouse_button]
+        )
 
     def is_mouse_button_double_pressed(self, mouse_button):
         """
@@ -215,9 +253,15 @@ class Input:
         :param int mouse_button: The mouse button to check.
         """
 
-        if self.current_mouse_button_states is None or self.previous_mouse_button_states is None:
+        if (
+            self.current_mouse_button_states is None
+            or self.previous_mouse_button_states is None
+        ):
             return False
-        return not self.current_mouse_button_states[mouse_button] and self.previous_mouse_button_states[mouse_button]
+        return (
+            not self.current_mouse_button_states[mouse_button]
+            and self.previous_mouse_button_states[mouse_button]
+        )
 
     def get_mouse_button_down_duration(self, mouse_button):
         """

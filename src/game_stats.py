@@ -1,21 +1,24 @@
+"""Module for managing game statistics in the Alien Invasion game.
+
+Defines the GameStats class for tracking the game's score, remaining ships,
+and game status, along with a method to reset these stats.
+"""
+
+from dataclasses import dataclass
+
+from src.settings import SHIP_LIMIT
+
+
+@dataclass
 class GameStats:
     """Track statistics for Alien Invasion."""
 
-    def __init__(self, ai_settings):
-        """Initialize statistics."""
-        self.ai_settings = ai_settings
-        self.reset_stats()
+    game_active = False
+    credits_active = False
+    ships_left: int = SHIP_LIMIT
+    score = 0
 
-        # Start game in an inactive state.
-        self.game_active = False
-
-        # Credits state.
-        self.credits_active = False
-
-        self.ships_left = 0
-        self.score = 0
-
-    def reset_stats(self):
+    def reset(self) -> None:
         """Initialize statistics that can change during the game."""
-        self.ships_left = self.ai_settings.ship_limit
+        self.ships_left = SHIP_LIMIT
         self.score = 0
