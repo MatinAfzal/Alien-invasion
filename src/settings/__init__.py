@@ -1,11 +1,8 @@
 from pathlib import Path
 import sys
 import pygame
-import json
-import re
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from src.pygame_console import Console
 
 pygame.init()
 
@@ -124,10 +121,6 @@ class Settings:
         self.init_hearts = 5
         self.max_hearts = 5
 
-        # Console
-        self.console_config = self.get_console_config_json("src/console_configs/console_config06.json")
-        self.console = Console(self, self.screen_width, self.console_config)
-
         # Background scrolling
         self.bg_screen_x = 0
         self.bg_screen_y = 0
@@ -136,14 +129,6 @@ class Settings:
         self.bg_screen_scroll_speed = 0.2
 
         self.initialize_dynamic_settings()
-
-    def get_console_config_json(self, config_file_path: str):
-        try:
-            with open(config_file_path, "r") as json_file:
-                json_data = json_file.read()
-                return json.loads(re.sub("[^:]//.*", "", json_data, flags=re.MULTILINE))
-        except FileNotFoundError:
-            raise
 
     def initialize_dynamic_settings(self):
         """Initialize settings that change throughout the game."""
