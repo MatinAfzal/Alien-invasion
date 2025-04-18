@@ -1,8 +1,8 @@
-"""."""
-
 from pathlib import Path
-
+import sys
 import pygame
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 pygame.init()
 
@@ -18,12 +18,7 @@ FONT = pygame.font.Font(
 )
 FONT_ACCENT: int = FONT.get_ascent()
 
-
 HEART_SPEED_FACTOR = 4
-
-
-# settings.py
-"""Module to store all settings for Alien Invasion"""
 
 # Clock
 FPS: float = 120.0
@@ -52,9 +47,9 @@ ALIEN_BULLET_SPEED_FACTOR: float = 5.0
 ALIEN_SPEED_FACTOR: float = 5.0
 CARGO_SPEED_FACTOR: float = 0.5
 FLEET_DROP_SPEED: int = 2
-CARGO_DROP_CHANCE: float = 0  # TODO: There is an interesting bug here
-ALIEN_FIRE_CHANCE: int = 100  # from 1000
-ALIEN_L2_FIRE_CHANCE: int = 200  # from 1000
+CARGO_DROP_CHANCE: float = 0
+ALIEN_FIRE_CHANCE: int = 100
+ALIEN_L2_FIRE_CHANCE: int = 200
 ALIEN_L2_HEALTH: int = 2
 ALIEN_L1_HEALTH: int = 1
 ALIEN_L2_SPAWN_CHANCE: int = 5
@@ -106,9 +101,9 @@ class Settings:
         self.alien_speed_factor = 5
         self.cargo_speed_factor = 0.5
         self.fleet_drop_speed = 2
-        self.cargo_drop_chance = 0  # TODO: There is an interesting bug in hereش
-        self.alien_fire_chance = 100  # from 1000
-        self.alien_l2_fire_chance = 200  # from 1000
+        self.cargo_drop_chance = 0
+        self.alien_fire_chance = 100
+        self.alien_l2_fire_chance = 200
         self.alien_l2_health = 2
         self.alien_l1_health = 1
         self.alien_l2_spawn_chance = 5
@@ -122,25 +117,24 @@ class Settings:
         self.alien_points = 50
         self.cargo_points = 100
 
-        self.initialize_dynamic_settings()
+        # Lives
+        self.init_hearts = 5
+        self.max_hearts = 5
 
-        # screen background settings.
+        # Background scrolling
         self.bg_screen_x = 0
         self.bg_screen_y = 0
         self.bg_screen_2_x = 0
         self.bg_screen_2_y = -self.screen_height
         self.bg_screen_scroll_speed = 0.2
 
+        self.initialize_dynamic_settings()
+
     def initialize_dynamic_settings(self):
-        """Increase speed settings and alien point values."""
-        # self.ship_speed_factor_x = 2.5
-        # self.ship_speed_factor_y = 1.5
-        # self.bullet_speed_factor = 3
+        """Initialize settings that change throughout the game."""
         self.alien_speed_factor = 2
         self.cargo_speed_factor = 0.5
         self.cargo_drop_chance = 0
-
-        # Scoring
         self.alien_points = 10
 
     def increase_speed(self):
@@ -153,4 +147,3 @@ class Settings:
         self.cargo_drop_chance *= self.speedup_scale
         self.alien_l2_spawn_chance *= self.speedup_scale
         self.alien_points = int(self.alien_points * self.score_scale)
-        # self.bullet_width += 4
