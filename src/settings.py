@@ -27,7 +27,7 @@ class Settings:
         self.alien_bullet_speed_factor = 5
 
         # Alien settings
-        self.alien_speed_factor = 5
+        self.alien_speed_factor = 10
         self.cargo_speed_factor = 0.5
         self.fleet_drop_speed = 2
         self.cargo_drop_chance = 0  # TODO: There is an interesting bug in hereش
