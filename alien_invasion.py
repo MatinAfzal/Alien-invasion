@@ -74,6 +74,7 @@ def run_game():
     alien_bullets = Group()
     hearts = Group()
     shields = Group()
+    powerup = Group()
 
     play_button = btn(
         "start",
@@ -128,6 +129,7 @@ def run_game():
                 health,
                 hearts,
                 shields,
+                powerup,
             )
         else:
             pygame.event.set_grab(False)
@@ -149,6 +151,7 @@ def run_game():
             health,
             hearts,
             shields,
+            powerup,
         )
 
         clock.tick(ai_settings.fps)
@@ -162,6 +165,7 @@ def run_game():
 
                 generate_heart(stats, screen, hearts)
                 gf.generate_shields(screen, ai_settings, stats, shields)
+                gf.generate_powerup(stats, powerup)
 
                 if alien_spawn_counter % 10 == 0:
                     gf.spawn_random_alien(ai_settings, screen, aliens)
@@ -175,6 +179,7 @@ def run_game():
             cargoes.empty()
             hearts.empty()
             shields.empty()
+            powerup.empty()
 
 
 run_game()

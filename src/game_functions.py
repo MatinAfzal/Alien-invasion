@@ -9,6 +9,7 @@ from src.animation import Animation
 from src.bullet import AlienBullet, ShipBullet
 from src.entities.items.heart import GENERATE_HEART_CHANCE, Heart
 from src.entities.items.shield import GENERATE_SHIELD_CHANCE, Shield
+from src.entities.items.power import GENERATE_POWER_CHANCE, PowerUp, PowerType
 
 from . import settings
 from .game_stats import GameStats
@@ -91,6 +92,7 @@ def update_game_sprites(
     health,
     hearts,
     shields,
+    powerup,
 ):
     ship.update()
     update_bullets(
@@ -108,6 +110,7 @@ def update_game_sprites(
     update_aliens(ai_settings, stats, ship, aliens, cargoes, health)
     update_hearts(ship, health, hearts)
     update_shields(ship, shields, health)
+    update_powerup(ship, powerup)
 
 
 def check_events(ai_settings, input, screen, stats, ship, bullets):
@@ -195,6 +198,7 @@ def update_screen(
     health,
     hearts,
     shields,
+    powerup,
 ):
     """Update image on the screen and flip to the new screen."""
     region_manager.update(screen, stats.score, ai_settings.delta_time)
@@ -205,7 +209,7 @@ def update_screen(
         try:
             bullet.draw()
         except:
-            # print("HERE")
+            print("HERE")
             pass
 
     for bullet in alien_bullets.sprites():
@@ -216,6 +220,9 @@ def update_screen(
 
     for shield in shields.sprites():
         shield.draw()
+    
+    for powerup in powerup.sprites():
+        powerup.draw()
 
     ship.bltime()
     aliens.draw(screen)
@@ -246,12 +253,35 @@ def update_screen(
     pygame.display.flip()
 
 
+def handle_spread_shot(ship, bullets):
+    for i in range(1, 6):
+        bullets.add(ShipBullet(ship, power=PowerType.SPREAD, num=i / 2))
+
+def handle_double_shot(ship, bullets):
+    for _ in range(2):
+        bullets.add(ShipBullet(ship, power=PowerType.DOUBLE))
+
+def handle_normal_shot(ship, bullets):
+    bullets.add(ShipBullet(ship))
+
+
 def fire_bullet(ship, bullets) -> None:
-    """Fire a bullet if limit not reached yet."""
-    # Create a new bullet and add it to the bullets group.
+    """
+    Fire bullet(s) from the ship depending on the current power-up.
+
+    - Power 1: Fires a 5-bullet spread shot.
+    - Power 2: Fires 2 bullets with double damage and double score (handled elsewhere).
+    - Power 0 (default): Fires a single bullet.
+    """
+    # Only fire if under the allowed bullet limit
     if len(bullets) < settings.BULLETS_ALLOWED:
-        new_bullet = ShipBullet(ship)
-        bullets.add(new_bullet)
+        if ship.power == PowerType.SPREAD:
+            handle_spread_shot(ship, bullets)
+        elif ship.power == PowerType.DOUBLE:
+            handle_double_shot(ship, bullets)
+        else:
+            handle_normal_shot(ship, bullets)
+
         sound_fire.play()
 
 
@@ -294,11 +324,12 @@ def update_bullets(
         bullets,
         cargoes,
         animations,
+        health,
     )
     check_bullet_ship_collisions(ai_settings, screen, stats, health, ship, aliens, alien_bullets, cargoes)
 
 
-def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets, cargoes, animations):
+def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets, cargoes, animations, health):
     """Respond to bullet-alien collisions."""
     # Remove any bullets and aliens that have collided.
     # Check for any bullets that have hit aliens.
@@ -319,6 +350,8 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 
             stats.score += ai_settings.alien_points * len(aliens)
             sb.update()
+            if ship.power == PowerType.HEALING:
+                health.increase()
             sound_explosion.play()
 
     # if we hit cargo:
@@ -473,12 +506,28 @@ def update_hearts(ship, health, hearts):
             hearts.remove(heart)
 
 
+def generate_powerup(stats, powerup_group):
+    if stats.game_active:
+        if randint(1,1000) <= GENERATE_POWER_CHANCE:
+            powerup = PowerUp()
+            powerup_group.add(powerup)
+
+def update_powerup(ship, powerup):
+    powerup.update()
+    ship.check()
+
+    check_collideany_ship_powerup = pygame.sprite.spritecollideany(ship, powerup)
+    if check_collideany_ship_powerup:
+        ship.activate_powerup(check_collideany_ship_powerup.power)
+        sound_shield_fill.play()
+        powerup.remove(check_collideany_ship_powerup)
+
+
 def generate_shields(screen, ai_settings, stats, shield_group):
     if stats.game_active:
         if randint(1, 1000) <= GENERATE_SHIELD_CHANCE:
             shield = Shield()
             shield_group.add(shield)
-
 
 def update_shields(ship, shields, health):
     shields.update()

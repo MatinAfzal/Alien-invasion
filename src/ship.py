@@ -2,6 +2,9 @@ import math
 
 import pygame
 
+import time
+
+from src.entities.items.power import POWER_TIME, PowerType
 from src.resources.texture_atlas import TextureAtlas
 from . import input, settings
 
@@ -30,6 +33,18 @@ class Ship(pygame.sprite.Sprite):
         self.moving_left = False
         self.moving_up = False
         self.moving_down = False
+
+        self.power = PowerType.NORMAL
+
+    def check(self) -> None:
+        """check power-up timer."""
+        if self.power != PowerType.NORMAL and time.time() - self.power_time >= POWER_TIME:
+            self.power = PowerType.NORMAL
+    
+    def activate_powerup(self, power) -> None:
+        """Activate temporary power-up."""
+        self.power = power
+        self.power_time = time.time()
 
     def update(self) -> None:
         """Update the ship's position based on the movement flag."""
