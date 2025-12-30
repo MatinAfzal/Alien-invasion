@@ -53,7 +53,7 @@ class Ship(pygame.sprite.Sprite):
         dy: float = mouse_pos[1] - self.center[1]
         self.angle: float = math.atan2(-dx, -dy)  # Calculate angle
 
-    def bltime(self) -> None:
+    def blitme(self) -> None:
         """Draw the ship at its current location."""
         rotated_image: pygame.Surface = pygame.transform.rotate(self.image, math.degrees(self.angle))
         rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.center)
