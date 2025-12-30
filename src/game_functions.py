@@ -217,7 +217,7 @@ def update_screen(
     for shield in shields.sprites():
         shield.draw()
 
-    ship.bltime()
+    ship.blitme()
     aliens.draw(screen)
     cargoes.draw(screen)
     health.draw()
