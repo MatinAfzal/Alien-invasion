@@ -217,7 +217,7 @@ def update_screen(
     for shield in shields.sprites():
         shield.draw()
 
-    ship.bltime()
+    ship.blitme()
     aliens.draw(screen)
     cargoes.draw(screen)
     health.draw()
@@ -249,7 +249,7 @@ def update_screen(
 def fire_bullet(ship, bullets) -> None:
     """Fire a bullet if limit not reached yet."""
     # Create a new bullet and add it to the bullets group.
-    if len(bullets) < settings.BULLETS_ALLOWED:
+    if len(bullets) < settings.BULLETS_ALLOWED and pygame.display.get_surface():
         new_bullet = ShipBullet(ship)
         bullets.add(new_bullet)
         sound_fire.play()
